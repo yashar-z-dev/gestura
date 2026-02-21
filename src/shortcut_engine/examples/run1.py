@@ -1,0 +1,42 @@
+from pathlib import Path
+import json
+import logging
+import time
+
+# API
+from shortcut_engine import ShortcutEngine, ActionEvent
+
+
+class main:
+    def __init__(self):
+        self.running = False
+
+        self._setup_engine()
+
+    def app_state(self, state: bool):
+        self.running = state
+
+    def _setup_engine(self):
+        BASE_DIR = Path(__file__).resolve().parent
+        json_path = BASE_DIR / "sample_config.json"
+
+        with open(json_path, "r", encoding="utf-8") as f:
+            config = json.load(f)
+
+        self._ShortcutEngine = ShortcutEngine(config, self.pump_worker_events)
+
+    def pump_worker_events(self, action_event: ActionEvent):
+        logging.info(action_event)
+        if action_event.callback == "exit":
+            self.running = False
+
+    def _loop(self):
+        # Keep Alive main thread
+        while self.running:
+            time.sleep(0.01)
+
+    def start(self):
+        logging.info("Engine is Started...")
+        self.app_state(True)
+        self._ShortcutEngine.start()
+        self._loop()

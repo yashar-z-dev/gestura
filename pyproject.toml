@@ -1,7 +1,56 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "shortcut-engine"
 version = "0.1.0"
-description = "A modular callback orchestration engine"
+description = "A deterministic, rate-controlled shortcut detection engine for keyboard and mouse events."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Yashar" }
+]
+
+keywords = [
+    "shortcut",
+    "keyboard",
+    "mouse",
+    "event-driven",
+    "automation",
+    "engine"
+]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Software Development :: Libraries",
+]
+
+dependencies = [
+    "pynput>=1.7",
+    "pydantic"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "black",
+    "ruff"
+]
+
+[project.urls]
+Homepage = "https://github.com/your-username/shortcut-engine"
+Repository = "https://github.com/your-username/shortcut-engine"
+Issues = "https://github.com/your-username/shortcut-engine/issues"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

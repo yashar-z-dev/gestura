@@ -12,7 +12,7 @@ import pytest
 def gesture_config():
     from pathlib import Path
     BASE_DIR = Path(__file__).resolve().parent
-    json_path = BASE_DIR / ".." / "examples" / "sample_config.json"
+    json_path = BASE_DIR / "sample_config.json"
     logging.info(json_path)
     with open(json_path, "r", encoding="utf-8") as f:
         return json.load(f)

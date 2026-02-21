@@ -1,0 +1,95 @@
+[
+    {
+        "mouse": {
+            "conditions": []
+        },
+        "keyboard": {
+            "conditions": [
+                "esc"
+            ]
+        },
+        "policy": {
+            "cooldown_seconds": 1.0,
+            "max_triggers": 1,
+            "rate_window_seconds": 5.0
+        },
+        "callback": "exit"
+    },
+    {
+        "mouse": {
+            "conditions": []
+        },
+        "keyboard": {
+            "conditions": [
+                "ctrl",
+                "ctrl"
+            ]
+        },
+        "policy": {
+            "cooldown_seconds": 1,
+            "max_triggers": 1,
+            "rate_window_seconds": 1
+        },
+        "callback": "pause"
+    },
+    {
+        "mouse": {
+            "conditions": [
+                {
+                    "axis": "y",
+                    "trend": "down",
+                    "min_delta": 100
+                },
+                {
+                    "axis": "x",
+                    "trend": "right",
+                    "min_delta": 100
+                },
+                {
+                    "axis": "y",
+                    "trend": "up",
+                    "min_delta": 100
+                },
+                {
+                    "axis": "x",
+                    "trend": "left",
+                    "min_delta": 100
+                }
+            ]
+        },
+        "keyboard": {
+            "conditions": [
+                "shift",
+                "h"
+            ]
+        },
+        "policy": {
+            "cooldown_seconds": 0.1,
+            "max_triggers": 10,
+            "rate_window_seconds": 5.0
+        },
+        "callback": "triggered"
+    },
+    {
+        "mouse": {
+            "conditions": [
+                {
+                    "axis": "y",
+                    "trend": "up",
+                    "min_delta": 100
+                }
+            ]
+        },
+        "keyboard": {
+            "conditions": [
+                "ctrl"
+            ]
+        },
+        "policy": {
+            "cooldown_seconds": 0.0,
+            "max_triggers": 10,
+            "rate_window_seconds": 1.0
+        },
+        "callback": "triggered1"
+    }
+]

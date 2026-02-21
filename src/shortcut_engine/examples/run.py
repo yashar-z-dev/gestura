@@ -2,10 +2,15 @@ from pathlib import Path
 import json
 import logging
 import time
+
+# API
+from shortcut_engine import ShortcutEngine
+
+# Adapters
 from ..adapters.action_bus import ActionBus
-from ..engine.engine import ShortcutEngine
 from ..adapters.shortcut_map import CallbackOrchestrator
 
+# Action definition
 from .exit import Logic_Exit, Action_Exit
 from .pause import Logic_Pause, Action_Pause
 
@@ -66,7 +71,3 @@ class main:
         self.app_state(True)
         self._ShortcutEngine.start()
         self._loop()
-
-if __name__ == "__main__":
-    _main = main()
-    _main.start()

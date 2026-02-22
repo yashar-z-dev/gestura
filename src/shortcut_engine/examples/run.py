@@ -71,3 +71,8 @@ class main:
         self.app_state(True)
         self._ShortcutEngine.start()
         self._loop()
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    _main = main()
+    _main.start()

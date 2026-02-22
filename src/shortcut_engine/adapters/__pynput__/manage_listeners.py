@@ -4,12 +4,10 @@ import logging
 from typing import Optional
 import traceback, copy
 
-from ...models.event import EventData_keyboard, EventData_click, EventData_move, __EVENTS__
+from ...models.event import EventData_keyboard, EventData_click, MouseButtons, EventData_move, __EVENTS__
 from ...config.models import HandlerConfig
 from ...models.protocols import ListenerKeyboardFactory, ListenerMouseFactory
-from ...models.event import is_valid_button
 from ...utils.key_normalizer import KeyUtils
-from ...models.event import EventData_keyboard
 
 
 class BaseListenerManager:
@@ -185,10 +183,11 @@ class ListenerManagerMouse(BaseListenerManager):
         Handle click event.
         Click events are forwarded without sampling.
         """
-        if not is_valid_button(button):
-            logging.debug("Ignored unsupported mouse button: %s", button)
-            return
 
-        event = EventData_click(x=x, y=y, position=button, press=press)
+        try:
+            event = EventData_click(x=x, y=y, position=MouseButtons(button), press=press)
+        except ValueError:
+            logging.warning("Ignored unsupported mouse button: %s", button)
+            return
 
         self._dispatch_to_handlers(event)

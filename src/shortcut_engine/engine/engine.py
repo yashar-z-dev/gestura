@@ -101,4 +101,3 @@ class ShortcutEngine:
         self._keyboard_listener.stop()
         self._mouse_listener.stop()
         self._worker.stop()
-

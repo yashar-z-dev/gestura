@@ -1,28 +1,36 @@
 # 100/100
 """
-TODO: 
 __all__ = (
     __EVENTS__,
     EventData_keyboard,
-    MouseButtonName, is_valid_button,
+    MouseButtonName, MouseButtons,
     EventData_click, EventData_move
 """
 
-from typing import Optional, Literal, Union, Annotated, TypeGuard
+from typing import Optional, Literal, Union, Annotated
 from dataclasses import dataclass
 from pydantic import Field
+from enum import Enum
 
 
 # ===== EventData Models =====
-@dataclass(frozen=True, slots=True)
-class EventData_keyboard:
+@dataclass(frozen=True, slots=True, kw_only=True)
+class _Base_Event:
+    """
+    Args:
+        id:   Primary key (sortable)
+        time: Capture time(Optianl) (sortable)
+    """
+    id:   Optional[int]   = None
+    time: Optional[float] = None
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class EventData_keyboard(_Base_Event):
     """
     Args:
         press: True if press else False
         key: All key in keyboard(ENG, another language not support all character)
-        modifiers: active modifiers when key use. (e.g. key="h", modifiers=["shift"] => "H")
-        id:   Primary key (sortable)
-        time: Capture time(Optianl) (sortable)
 
     NOTE: support another language good, but change language need to restart program.
 
@@ -31,38 +39,33 @@ class EventData_keyboard:
 
     key: str
     press: bool
-    id:   Optional[int]   = None
-    time: Optional[float] = None
     type: Literal["keyboard"] = "keyboard"
 
 
-MouseButtonName = Literal["left", "right", "middle"]
+class MouseButtons(str, Enum):
+    LEFT = "left"
+    RIGHT = "right"
+    MIDDLE = "middle"
 
-def is_valid_button(name: str) -> TypeGuard[MouseButtonName]:
-    return name in {"left", "right", "middle"}
-
-@dataclass(frozen=True, slots=True)
-class EventData_click:
+@dataclass(frozen=True, slots=True, kw_only=True)
+class EventData_click(_Base_Event):
     """
     Args:
         press: True if press else False
         position: click action name position
         x: Mouse position on the X axis on the monitor
         y: Mouse position on the Y axis on the monitor
-        screenshots: Screenshot of the current mouse position for use in machine vision
     """
 
     x: int
     y: int
-    position: MouseButtonName
+    position: MouseButtons
     press: bool
-    id:   Optional[int]   = None
-    time: Optional[float] = None
     type: Literal["click"] = "click"
 
 
-@dataclass(frozen=True, slots=True)
-class EventData_move:
+@dataclass(frozen=True, slots=True, kw_only=True)
+class EventData_move(_Base_Event):
     """
     Args:
         x: Mouse position on the X axis on the monitor
@@ -71,13 +74,11 @@ class EventData_move:
 
     x: int
     y: int
-    id:   Optional[int]   = None
-    time: Optional[float] = None
     type: Literal["move"] = "move"
 
 
 # ===== Support Models =====
 __EVENTS__ = Annotated[
     Union[EventData_keyboard, EventData_click, EventData_move],
-    Field(discriminator="axis"),
+    Field(discriminator="type"),
 ]

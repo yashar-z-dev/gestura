@@ -9,6 +9,8 @@ from typing import Protocol, TypeVar, Generic, Type
 T_co = TypeVar("T_co", covariant=True)
 # T_contra: contravariant type consumed by Action (Action ← payload)
 T_contra = TypeVar("T_contra", contravariant=True)
+T = TypeVar("T")
+C = TypeVar("C")
 
 # ==============================
 # LogicResult: wrapper for Logic output
@@ -50,9 +52,6 @@ class ActionProtocol(Protocol[T_contra]):
 # ==============================
 # Callback Configuration
 # ==============================
-
-T = TypeVar("T")
-
 @dataclass(frozen=True)
 class CallbackConfig(Generic[T]):
     """

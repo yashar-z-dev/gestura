@@ -36,20 +36,18 @@ class KeyUtils:
 
         if isinstance(key, Key):
             name = str(key)[4:].lower() if str(key).startswith("Key.") else str(key).lower()
+
         elif isinstance(key, KeyCode):
             name = key.char.lower() if key.char else ""
-        elif isinstance(key, str):
-            name = key.lower()
+
         else:
-            return False
+            # here key is guaranteed to be str
+            name = key.lower()
 
         return bool(KeyUtils.MODIFIER_PATTERN.match(name))
 
     @staticmethod
     def normalize_modifier_name(name: str) -> str:
-        if not isinstance(name, str):
-            return ""
-
         name = name.strip()
         if "ctrl" in name or "control" in name:
             return "ctrl"
@@ -64,7 +62,7 @@ class KeyUtils:
     @staticmethod
     @lru_cache(maxsize=512)
     def control_char_to_key(char: str) -> Optional[str]:
-        if not isinstance(char, str) or len(char) != 1:
+        if len(char) != 1:
             return None
         code = ord(char)
         if 1 <= code <= 26:
@@ -115,7 +113,7 @@ class KeyUtils:
                 return "KeyCode"
             return KeyCode.from_char("")
 
-        if isinstance(key, str):
+        elif isinstance(key, str):
             name = key
 
             # Remove 'key.' prefix and surrounding quotes but do NOT strip (important for control chars)
@@ -141,7 +139,7 @@ class KeyUtils:
                     return getattr(Key, norm_name)
                 return KeyCode.from_char(norm_name if len(norm_name) == 1 else "")
 
-        if isinstance(key, Key):
+        elif isinstance(key, Key):
             base = str(key)[4:] if str(key).startswith("Key.") else str(key)
             norm = KeyUtils.normalize_modifier_name(base)
             if output_type == "str":
@@ -153,20 +151,14 @@ class KeyUtils:
                     return KeyUtils.SIMPLE_MODIFIERS[norm]
                 return key
 
-        if isinstance(key, KeyCode):
-            if output_type == "object":
-                return key if key.char is not None else KeyCode.from_char("")
-            if output_type == "str":
-                return key.char if key.char else ""
-            if output_type == "type":
-                return "KeyCode"
-
-        # fallback
+        # elif isinstance(key, KeyCode):
+        # here most KeyCode
+        if output_type == "object":
+            return key if key.char is not None else KeyCode.from_char("")
         if output_type == "str":
-            return str(key)
+            return key.char if key.char else ""
         if output_type == "type":
-            return type(key).__name__
-        return KeyCode.from_char("")
+            return "KeyCode"
 
     @staticmethod
     @overload

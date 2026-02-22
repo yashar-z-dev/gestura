@@ -6,7 +6,7 @@ tests:
 """
 
 import logging
-from typing import Any, Dict, List, Tuple, Optional
+from typing import Any, Tuple, Optional
 
 from ...models.mouse import GestureMouseCondition
 from ...models.event import EventData_move
@@ -21,7 +21,7 @@ class MouseGestureDetector:
 
     def __init__(
         self,
-        gesture_definitions: List[GestureMouseCondition],
+        gesture_definitions: list[GestureMouseCondition],
         segment_min_delta: float,
         jitter_max_delta: Optional[float] = None,
         lookahead: int = 2,
@@ -31,7 +31,7 @@ class MouseGestureDetector:
         self.jitter_max_delta = jitter_max_delta or segment_min_delta
         self.lookahead = lookahead
 
-        self._first_condition_index: Dict[Tuple[str, str], List[GestureMouseCondition]] = {}
+        self._first_condition_index: dict[Tuple[str, str], list[GestureMouseCondition]] = {}
         self._build_first_condition_index()
 
     # ============================================================
@@ -55,8 +55,8 @@ class MouseGestureDetector:
             return "right" if delta > 0 else "left"
         return "down" if delta > 0 else "up"
 
-    def extract_segments(self, events: List[EventData_move]) -> List[Dict[str, Any]]:
-        segments: List[Dict[str, Any]] = []
+    def extract_segments(self, events: list[EventData_move]) -> list[dict[str, Any]]:
+        segments: list[dict[str, Any]] = []
         segments += self._build_axis_segments(events, "x")
         segments += self._build_axis_segments(events, "y")
 
@@ -74,11 +74,11 @@ class MouseGestureDetector:
 
     def _build_axis_segments(
         self,
-        events: List[EventData_move],
+        events: list[EventData_move],
         axis: str,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
 
-        segments: List[Dict[str, Any]] = []
+        segments: list[dict[str, Any]] = []
 
         start_index = 0
         start_value = getattr(events[0], axis)
@@ -152,7 +152,7 @@ class MouseGestureDetector:
 
     def _is_real_reversal(
         self,
-        events: List[EventData_move],
+        events: list[EventData_move],
         axis: str,
         index: int,
         current_trend: str,
@@ -213,9 +213,9 @@ class MouseGestureDetector:
 
     def _match_gesture(
         self,
-        segments: List[Dict[str, Any]],
+        segments: list[dict[str, Any]],
         gesture: GestureMouseCondition,
-        start_segment: Dict[str, Any],
+        start_segment: dict[str, Any],
     ) -> Optional[int]:
 
         last_end_id = start_segment["end_id"]
@@ -257,12 +257,12 @@ class MouseGestureDetector:
     # PUBLIC
     # ============================================================
 
-    def detect(self, events: List[EventData_move]) -> List[Tuple[str, int]]:
+    def detect(self, events: list[EventData_move]) -> list[Tuple[str, int]]:
         """
         Returns raw (callback, occurrence_end_id)
         """
 
-        occurrences: List[Tuple[str, int]] = []
+        occurrences: list[Tuple[str, int]] = []
 
         segments = self.extract_segments(events)
         if not segments:
@@ -295,14 +295,14 @@ class MouseGestureOccurrenceFilter:
     """
 
     def __init__(self):
-        self._last_occurrence_end_id: Dict[str, int] = {}
+        self._last_occurrence_end_id: dict[str, int] = {}
 
     def filter(
         self,
-        occurrences: List[Tuple[str, int]]
-    ) -> List[str]:
+        occurrences: list[Tuple[str, int]]
+    ) -> list[str]:
 
-        triggered: List[str] = []
+        triggered: list[str] = []
 
         for callback, end_id in occurrences:
 
@@ -324,13 +324,13 @@ class MouseGestureOccurrenceFilter:
 
 class MouseGesturePipeline:
 
-    def __init__(self, gesture_definitions, segment_min_delta):
+    def __init__(self, gesture_definitions: list[GestureMouseCondition], segment_min_delta: float):
         self.detector = MouseGestureDetector(
-            gesture_definitions,
-            segment_min_delta,
+            gesture_definitions=gesture_definitions,
+            segment_min_delta=segment_min_delta,
         )
         self.filter = MouseGestureOccurrenceFilter()
 
-    def process_for_trigger(self, events):
+    def process_for_trigger(self, events: list[EventData_move]):
         raw = self.detector.detect(events)
         return self.filter.filter(raw)

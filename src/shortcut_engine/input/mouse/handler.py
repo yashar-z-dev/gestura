@@ -1,9 +1,10 @@
-from typing import Callable
+import logging
+from typing import Callable, Optional
 
+from ...models.event import EventData_click, MouseButtons, EventData_move
+from ...config.models import MouseConfig, MouseEvent
 from .pipeline import MouseGesturePipeline
-from ...models.event import EventData_click, EventData_move
 from ..event_buffer import EventBuffer
-from ...config.models import MouseConfig
 
 
 class MouseApp:
@@ -18,33 +19,71 @@ class MouseApp:
     """
 
     def __init__(self, config: MouseConfig) -> None:
+        self._move_counter: int = 0    # incremental id
+        self._move_event_id: int = 0   # incremental id
+        self._click_event_id: int = 0  # incremental id
+        self._rate_frequency: int = 1  # frequency rate filtering for low-performance
 
         # External callback to notify when a gesture is triggered
         self._emit_callback: Callable[[list[str]], None] = config.on_trigger
 
         # Pipeline handles all recognition logic
         self._pipeline = MouseGesturePipeline(
-            gesture_definitions=config.gestures, # type "GestureMouseCondition"
+            gesture_definitions=config.gestures,
             segment_min_delta=config.min_delta
         )
 
         # Time-sliced event buffer
-        self._buffer = EventBuffer(window=config._buffer_window_seconds)
-
-        # Minimum number of samples required before evaluation
-        # This is NOT semantic filtering — only to avoid trivial calls.
-        self._min_samples: int = config._min_samples # keep small to avoid false negatives
+        self._buffer = EventBuffer(window=config.BufferWindowSeconds)
 
     # ------------------------------------------------------------------ #
     # Event Handling
     # ------------------------------------------------------------------ #
+    def _validator(self, event: MouseEvent) -> Optional[EventData_move | EventData_click]:
+        """
+        Generate EventData_move | EventData_click private models.
+        """
 
-    def _handle_event(self, event: EventData_click | EventData_move) -> None:
+        # Filter negative coordinates
+        if event.x < 0 or event.y < 0:
+            # warning (most apply map for negative values, some time rate negative so hight)
+            logging.debug(f"Ignored unsupported mouse negative; x={event.x}, y={event.y}")
+            return
 
-        if event.type == "move":
-            self._handle_move(event)
-        elif event.type == "click":
-            self._handle_click(event)
+        # Detected move or click
+        if event.press is None:
+
+            # Apply sampling rate
+            if self.should_skip_move():
+                return
+
+            # move event: Generate EventData_move
+            # Assign internal move ID
+            valid_event = EventData_move(id=self._move_event_id, x=event.x, y=event.y)
+            self._move_event_id += 1
+
+        else:
+            # click event: Generate EventData_click
+            # Assign internal click ID
+            try:
+                valid_event = EventData_click(
+                    id=self._click_event_id, x=event.x, y=event.y, position=MouseButtons(event.position), press=event.press)
+            except ValueError:
+                logging.warning("Ignored unsupported mouse position button: %s", event.position)
+                return
+
+            self._click_event_id += 1
+
+        return valid_event
+    
+    def should_skip_move(self) -> bool:
+        """ frequency filter move """
+        self._move_counter += 1
+        # Apply sampling rate
+        if self._move_counter % self._rate_frequency != 0:
+            return True
+
+        return False
 
     def _handle_move(self, event: EventData_move) -> None:
         """
@@ -53,8 +92,7 @@ class MouseApp:
         self._buffer.add(event)
 
         # Lightweight guard — prevents processing extremely small sequences
-        if len(self._buffer) >= self._min_samples:
-            self._evaluate_gestures()
+        self._evaluate_gestures()
 
     def _handle_click(self, event: EventData_click) -> None:
         """
@@ -77,3 +115,17 @@ class MouseApp:
         callbacks = self._pipeline.process_for_trigger(snapshot)
 
         self._emit_callback(callbacks)
+
+    # ------------------------------------------------------------------ #
+    # API
+    # ------------------------------------------------------------------ #
+    def HandleEvens(self, event: MouseEvent) -> None:
+
+        valid_event = self._validator(event)
+        if valid_event is None:
+            return
+
+        if valid_event.type == "move":
+            self._handle_move(valid_event)
+        elif valid_event.type == "click":
+            self._handle_click(valid_event)

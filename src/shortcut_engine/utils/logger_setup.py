@@ -2,6 +2,7 @@
 
 from typing import Optional
 import logging
+from logging import LogRecord
 import sys
 import inspect
 
@@ -18,7 +19,7 @@ class RootLogger:
     """
 
     @staticmethod
-    def setup(log_file: Optional[str] = None, level=logging.INFO):
+    def setup(log_file: Optional[str] = None, level: int = logging.INFO):
         """
         Initialize the root logger.
 
@@ -38,7 +39,7 @@ class RootLogger:
         class CallerFilter(logging.Filter):
             """Filter that adds caller information (Class.Method or Module.Function)."""
 
-            def filter(self, record):
+            def filter(self, record: LogRecord):
                 # Inspect call stack
                 stack = inspect.stack()
                 record.caller = "<unknown>"

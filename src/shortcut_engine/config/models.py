@@ -5,12 +5,11 @@ from dataclasses import dataclass, field
 import warnings
 import time
 
-from ..models.event import __EVENTS__
 from ..models.keyboard import GestureKeyboardCondition
 from ..models.mouse import GestureMouseCondition
-from ..models.protocols import PolicyEngineProtocol
-from ..models.policy import ActionEvent
+from ..models.policy import PolicyEngineProtocol, ActionEvent
 from ..config.parser import WorkerGestureMap
+from ..models.inputs import KeyboardEvent, MouseEvent
 
 
 # ===== Models =====
@@ -64,7 +63,7 @@ class KeyboardConfig:
 
     gestures: list[GestureKeyboardCondition] = field(default_factory=list)
     on_trigger: Callable[[list[str]], None] = lambda _: None
-    _buffer_window_seconds: float = 1.5
+    BufferWindowSeconds: float = 1.5
 
     def __post_init__(self):
         if not self.gestures:
@@ -151,10 +150,8 @@ class MouseConfig:
 
     gestures: list[GestureMouseCondition] = field(default_factory=list)
     on_trigger: Callable[[list[str]], None] = lambda _: None
-    _buffer_window_seconds: float = 4.0
+    BufferWindowSeconds: float = 4.0
     min_delta: float = 10.0
-    _min_samples: int = 8
-    rate: int = 2
 
     def __post_init__(self):
         if not self.gestures:
@@ -189,17 +186,14 @@ class ShortcutConfig:
     combined_window_seconds: float = 5.0
     func_now: Callable[[], float] = time.monotonic
 
+@dataclass(slots=True)
+class HandlerKeyboardConfig:
+    name: str
+    handler: Callable[[KeyboardEvent], None]
+    enabled: bool = True
 
 @dataclass(slots=True)
-class HandlerConfig:
-    """
-    TODO: use handler: Protocol_KeyboardListener | Protocol_MouseListener
-
-    NOTE: now is type checker error
-    """
-
+class HandlerMouseConfig:
     name: str
-    handler: Callable[[__EVENTS__], None]
-    # handler: Protocol_KeyboardListener | Protocol_MouseListener
-    requires_copy: bool = True
+    handler: Callable[[MouseEvent], None]
     enabled: bool = True

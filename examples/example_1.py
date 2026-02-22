@@ -18,7 +18,7 @@ class main:
 
     def _setup_engine(self):
         BASE_DIR = Path(__file__).resolve().parent
-        json_path = BASE_DIR / "sample_config.json"
+        json_path = BASE_DIR / "examples" / "sample_config.json"
 
         with open(json_path, "r", encoding="utf-8") as f:
             config = json.load(f)

@@ -3,7 +3,7 @@ TriggerEvent  →  Policy  →  ActionEvent
 """
 
 from dataclasses import dataclass, field
-from typing import Literal
+from typing import Literal, Protocol
 from collections import deque
 
 
@@ -46,4 +46,12 @@ class CallbackState:
     last_executed_at: float = 0.0
 
     # Execution timestamps for sliding rate window
-    execution_timestamps: deque = field(default_factory=deque)
+    execution_timestamps: deque[float] = field(default_factory=deque)
+
+
+class PolicyEngineProtocol(Protocol):
+    """
+    Public contract required by ShortcutWorker.
+    """
+
+    def evaluate(self, _TriggerEvent: TriggerEvent) -> bool: ...

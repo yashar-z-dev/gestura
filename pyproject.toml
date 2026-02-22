@@ -4,13 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "shortcut-engine"
-version = "0.1.1"
+version = "1.0.0"
 description = "A deterministic, rate-controlled shortcut detection engine for keyboard and mouse events."
 readme = "README.md"
 requires-python = ">=3.12"
 license = { file = "LICENSE" }
+
 authors = [
-    { name = "Yashar" }
+    { name = "yashar-z-dev" }
 ]
 
 keywords = [
@@ -23,20 +24,19 @@ keywords = [
 ]
 
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Operating System :: OS Independent",
     "License :: OSI Approved :: MIT License",
     "Topic :: Software Development :: Libraries",
+    "Typing :: Typed"
 ]
 
 dependencies = [
     "pynput>=1.7",
-    "pydantic"
+    "pydantic>=2"
 ]
 
 [project.optional-dependencies]
@@ -44,19 +44,24 @@ dev = [
     "pytest",
     "pytest-cov",
     "black",
-    "ruff"
+    "ruff",
+    "pyright"
 ]
 
 [project.urls]
-Homepage = "https://github.com/your-username/shortcut-engine"
-Repository = "https://github.com/your-username/shortcut-engine"
-Issues = "https://github.com/your-username/shortcut-engine/issues"
+Homepage = "https://github.com/yashar-z-dev/shortcut-engine"
+Repository = "https://github.com/yashar-z-dev/shortcut-engine"
+Issues = "https://github.com/yashar-z-dev/shortcut-engine/issues"
+Documentation = "https://github.com/yashar-z-dev/shortcut-engine#readme"
 
 [tool.setuptools]
-package-dir = {"" = "src"}
+package-dir = { "" = "src" }
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+shortcut_engine = ["py.typed"]
 
 [project.scripts]
 shortcut-engine-demo = "shortcut_engine.demo:main"

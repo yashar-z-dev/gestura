@@ -1,4 +1,5 @@
 import time
+from typing import Callable
 
 from ..input.keyboard.listener import KeyboardListener
 from ..utils.key_normalizer import KeyUtils
@@ -6,7 +7,7 @@ from ..utils.key_normalizer import KeyUtils
 
 # ========== USEAGE ==========
 class KeyCollector:
-    def __init__(self, duration_seconds: float = 2.0, callback = lambda msg: None):
+    def __init__(self, duration_seconds: float = 2.0, callback: Callable[[str], None] = lambda _: None):
         """
         Args:
             duration_seconds: listener timer

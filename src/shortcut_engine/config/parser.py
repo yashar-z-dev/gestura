@@ -6,7 +6,7 @@ tests:
 """
 
 from dataclasses import dataclass
-from typing import Dict, List
+from typing import Any
 
 from ..models.keyboard import GestureKeyboardCondition
 from ..models.mouse import GestureMouseCondition
@@ -20,14 +20,14 @@ class ShortcutConfigBundle:
     """
 
     # For listeners
-    keyboard_gestures: List[GestureKeyboardCondition]
-    mouse_gestures: List[GestureMouseCondition]
+    keyboard_gestures: list[GestureKeyboardCondition]
+    mouse_gestures: list[GestureMouseCondition]
 
     # For worker dispatch
     worker_map: "WorkerGestureMap"
 
     # For policy engine
-    policies: Dict[str, CallbackPolicy]
+    policies: dict[str, CallbackPolicy]
 
 
 # -------------------------
@@ -43,8 +43,8 @@ class WorkerGestureMap:
 
 @dataclass(frozen=True, slots=True)
 class GesturesMap:
-    keyboard_gestures: List[GestureKeyboardCondition]
-    mouse_gestures: List[GestureMouseCondition]
+    keyboard_gestures: list[GestureKeyboardCondition]
+    mouse_gestures: list[GestureMouseCondition]
 
 
 def _build_worker_map(_GesturesMap: GesturesMap) -> WorkerGestureMap:
@@ -70,12 +70,12 @@ def _build_worker_map(_GesturesMap: GesturesMap) -> WorkerGestureMap:
 # Policy Builder
 # -------------------------
 
-def _build_policy_map(config: List[dict]) -> Dict[str, CallbackPolicy]:
+def _build_policy_map(config: list[dict[str, Any]]) -> dict[str, CallbackPolicy]:
     """
     Build callback → policy mapping.
     """
 
-    policy_map: Dict[str, CallbackPolicy] = {}
+    policy_map: dict[str, CallbackPolicy] = {}
 
     for item in config:
         callback = item["callback"]
@@ -94,13 +94,13 @@ def _build_policy_map(config: List[dict]) -> Dict[str, CallbackPolicy]:
 # -------------------------
 # Public Parser
 # -------------------------
-def _buil_gesters_map(config: List[dict]) -> GesturesMap:
+def _buil_gesters_map(config: list[dict[str, Any]]) -> GesturesMap:
     """
     Parse full shortcut config and return structured bundle.
     """
 
-    keyboard_list: List[GestureKeyboardCondition] = []
-    mouse_list: List[GestureMouseCondition] = []
+    keyboard_list: list[GestureKeyboardCondition] = []
+    mouse_list: list[GestureMouseCondition] = []
 
     for item in config:
         callback = item["callback"]
@@ -130,7 +130,7 @@ def _buil_gesters_map(config: List[dict]) -> GesturesMap:
     )
 
 
-def parse_shortcut_config(config: List[dict]) -> ShortcutConfigBundle:
+def parse_shortcut_config(config: list[dict[str, Any]]) -> ShortcutConfigBundle:
     """
     Parse full shortcut config and return structured bundle.
     """

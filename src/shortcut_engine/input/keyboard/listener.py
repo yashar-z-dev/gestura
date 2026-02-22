@@ -1,5 +1,5 @@
 # 100/100
-from typing import Callable, Optional
+from typing import Callable, Optional, Any
 
 import pynput
 
@@ -25,20 +25,20 @@ class KeyboardListener:
         self._listener: Optional[pynput.keyboard.Listener] = None
 
     # ---------------- Internal Event Callback ---------------- #
-    def _on_press(self, key) -> None:
+    def _on_press(self, key: Any) -> None:
         """
         Internal handler for key press events.
         """
         self.on_event_callback(self._normalize_key(key), True)
 
-    def _on_release(self, key) -> None:
+    def _on_release(self, key: Any) -> None:
         """
         Internal handler for key release events.
         """
 
         self.on_event_callback(self._normalize_key(key), False)
 
-    def _normalize_key(self, key) -> str:
+    def _normalize_key(self, key: Any) -> str:
         """
         Convert external key object to normalized string.
         Boundary adaptation only.

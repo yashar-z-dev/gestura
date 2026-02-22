@@ -1,13 +1,14 @@
 # 100/100
 
-from typing import Callable
+import logging
+from typing import Callable, Optional
 
+from ...config.models import KeyboardConfig, KeyboardEvent
 from ...models.keyboard import GestureKeyboardCondition
-from .pipeline import KeyboardGesturePipeline
-from ..event_buffer import EventBuffer
-
 from ...models.event import EventData_keyboard
-from ...config.models import KeyboardConfig
+from .pipeline import KeyboardGesturePipeline
+from ...utils.key_normalizer import KeyUtils
+from ..event_buffer import EventBuffer
 
 
 class KeyboardApp:
@@ -27,16 +28,16 @@ class KeyboardApp:
             config: Keyboard configuration containing gesture definitions and runtime settings.
             on_trigger: Callback executed when a gesture is successfully recognized.
         """
+        self._event_id: int = 0  # incremental id
 
         # External callback to notify when a gesture is triggered
         self._emit_callback: Callable[[list[str]], None] = config.on_trigger
 
         # Configuration
         self._gesture_definitions: list[GestureKeyboardCondition] = config.gestures
-        self._buffer_window_seconds: float = config._buffer_window_seconds  # Time window for gesture detection
 
         # Time-windowed key buffer
-        self._event_buffer = EventBuffer(self._buffer_window_seconds)
+        self._event_buffer = EventBuffer(config.BufferWindowSeconds) # Time window for gesture detection
 
         # Gesture pipeline (responsible for matching logic)
         # Internally builds an index by starting key
@@ -47,17 +48,19 @@ class KeyboardApp:
     # ------------------------------------------------------------------
     # Public Event Entry Point
     # ------------------------------------------------------------------
-
-    def _handle_event(self, event: EventData_keyboard) -> None:
+    def _validator(self, event: KeyboardEvent) -> Optional[EventData_keyboard]:
         """
-        Main entry point for incoming keyboard events.
-        Normalizes and routes events to appropriate handlers.
+        Generate EventData_keyboard private model.
         """
 
-        if event.press:
-            self._handle_key_press(event)
-        else:
-            self._handle_key_release(event)
+        key_name = KeyUtils.parse_key(key=event.key, output_type="str")
+        if not key_name:
+            logging.debug("Ignored unsupported key name: %s", event.key)
+            return
+
+        valid_event = EventData_keyboard(id=self._event_id, key=key_name, press=event.press)
+        self._event_id += 1
+        return valid_event
 
     # ------------------------------------------------------------------
     # Internal Event Handlers
@@ -108,3 +111,22 @@ class KeyboardApp:
 
         # Emit callbacks
         self._emit_callback(matched_callbacks)
+
+
+    # ------------------------------------------------------------------ #
+    # API
+    # ------------------------------------------------------------------ #
+    def HandleEvens(self, event: KeyboardEvent) -> None:
+        """
+        Main entry point for incoming keyboard events.
+        Normalizes and routes events to appropriate handlers.
+        """
+
+        valid_event = self._validator(event)
+        if valid_event is None:
+            return
+
+        if event.press:
+            self._handle_key_press(valid_event)
+        else:
+            self._handle_key_release(valid_event)

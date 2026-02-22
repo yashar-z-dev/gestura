@@ -12,7 +12,7 @@ __all__ = (
 
 # NOTE: CPU 4% USE
 
-from typing import Literal, Union, Annotated, overload, Iterable
+from typing import Literal, Union, Annotated, overload, Iterable, Any
 from pydantic import BaseModel, Field, TypeAdapter, ConfigDict
 
 
@@ -97,7 +97,7 @@ class GestureMouse(BaseModel):
     @overload
     def add_condition(
         self,
-        data: Iterable[dict | GestureMouseValidator] | dict,
+        data: Iterable[dict[str, Any] | GestureMouseValidator] | dict[str, Any],
     ) -> list[GestureMouseValidator]: ...
 
     # -------- private API --------
@@ -171,7 +171,7 @@ class GestureMouseCondition(GestureMouse):
 # ===== Validators =====
 GestureMouseConditionAdapter = TypeAdapter(list[GestureMouseCondition])
 
-def Validator_GestureMouseCondition(data: list[dict]):
+def Validator_GestureMouseCondition(data: list[dict[str, Any]]):
     """
     :param data: format GestureMouseCondition.
 

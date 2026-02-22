@@ -60,7 +60,7 @@ def main():
     print("-" * 30)
     print("1. Press ESC → exit")
     print("2. Move mouse UP 100px then LEFT 400px → trigger #2")
-    print("3. Hold CTRL and move mouse DOWN 20px → trigger #3")
+    print("3. CTRL + move mouse DOWN 20px (within 5 seconds, order doesn't matter) → trigger #3")
     print("-" * 30)
     print("Perform gestures now...\n")
 

@@ -1,0 +1,10 @@
+{
+    "typeCheckingMode": "strict",
+    "reportMissingImports": true,
+    "reportMissingTypeStubs": false,
+    "reportUnusedImport": false,
+    "reportUnknownParameterType": false,
+    "reportUnknownVariableType": false,
+    "reportUnknownMemberType": false,
+    "reportUnknownArgumentType": false
+}

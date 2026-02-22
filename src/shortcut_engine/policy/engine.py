@@ -80,9 +80,6 @@ class PolicyEngine:
         Sliding window rate limiter.
         """
 
-        if policy.max_triggers is None:
-            return True
-
         window_start = now - policy.rate_window_seconds
 
         # Remove expired timestamps

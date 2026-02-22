@@ -1,8 +1,8 @@
 import logging
 import inspect
 
-from typing import Type, Callable
-from .models import CallbackConfig, LogicProtocol, ActionProtocol, T
+from typing import Any, Optional, Type, Callable
+from .models import LogicResult, CallbackConfig, LogicProtocol, ActionProtocol, T, C
 
 # ==============================
 # Registry with helper and introspection
@@ -16,12 +16,12 @@ class CallbackOrchestrator:
 
     def __init__(
             self,
-            dependency_mapping: dict[str,object],
-            dispatcher_ui: Callable[[dict], None],
+            dependency_mapping: dict[str, object],
+            dispatcher_ui: Callable[[dict[str, str]], None],
             # event_overlay: Callable[[OverlayState], None]
             ):
         # Mapping of callback key -> CallbackConfig
-        self._registry: dict[str, CallbackConfig] = {}
+        self._registry: dict[str, CallbackConfig[Any]] = {}
 
         # Mapping of dependency name -> actual object
         # This will be used by introspection to inject dependencies
@@ -52,21 +52,16 @@ class CallbackOrchestrator:
             notification=notification,
         )
 
-    def get(self, key: str) -> CallbackConfig | None:
+    def get(self, key: str) -> Optional[CallbackConfig[Any]]:
         return self._registry.get(key)
 
     # ===== Dynamic instantiation =====
-    def _instantiate(self, cls: type):
-        """
-        Dynamically instantiate a Logic or Action class using introspection.
-
-        Rules:
-            1. __init__ parameters (excluding 'self') are matched by name in dependency_mapping
-            2. Raises KeyError if a required dependency is missing
-            3. Allows Logic/Action classes to be fully generic
-        """
+    def _instantiate(self, cls: Type[C]) -> C:
         sig = inspect.signature(cls.__init__)
-        param_names = [p.name for p in sig.parameters.values() if p.name != "self"]
+        param_names = [
+            p.name for p in sig.parameters.values()
+            if p.name != "self"
+        ]
         args = [self.dependency_mapping[name] for name in param_names]
         return cls(*args)
 
@@ -85,8 +80,8 @@ class CallbackOrchestrator:
         # self._emit_UI(cb_key)
 
         # ===== Logic =====
-        logic_instance = self._instantiate(config.logic)
-        result = logic_instance.execute()
+        logic_instance: LogicProtocol[Any] = self._instantiate(config.logic)
+        result: LogicResult[Any] = logic_instance.execute()
 
         # ===== UI updates =====
         logging.info(f"Execute: {cb_key}, state: {result.ui_message}")

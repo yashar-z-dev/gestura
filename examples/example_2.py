@@ -8,7 +8,7 @@ from shortcut_engine import ShortcutEngine
 
 # Adapters
 from ..adapters.action_bus import ActionBus
-from ..adapters.shortcut_map import CallbackOrchestrator
+from ..adapters.callback_orchestrator import CallbackOrchestrator
 
 # Action definition
 from .exit import Logic_Exit, Action_Exit
@@ -34,7 +34,7 @@ class main:
 
     def _setup_engine(self):
         BASE_DIR = Path(__file__).resolve().parent
-        json_path = BASE_DIR / "sample_config.json"
+        json_path = BASE_DIR / "examples" / "sample_config.json"
 
         with open(json_path, "r", encoding="utf-8") as f:
             config = json.load(f)

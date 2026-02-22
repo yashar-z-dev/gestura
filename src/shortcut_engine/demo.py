@@ -5,29 +5,19 @@ def main():
 
     logging.basicConfig(level=logging.INFO)
 
-    # -------------------------------------------------
-    # Shared policy (readable & reusable)
-    # -------------------------------------------------
     DEFAULT_POLICY = {
         "cooldown_seconds": 1.0,
         "max_triggers": 1,
         "rate_window_seconds": 5.0
     }
 
-    # -------------------------------------------------
-    # Demo configuration
-    # -------------------------------------------------
     config = [
-
-        # 1. Keyboard only
         {
             "keyboard": {"conditions": ["esc"]},
             "mouse": {"conditions": []},
             "policy": DEFAULT_POLICY,
             "callback": "exit"
         },
-
-        # 2. Mouse only
         {
             "keyboard": {"conditions": []},
             "mouse": {
@@ -42,8 +32,6 @@ def main():
             },
             "callback": "mouse_up_100_then_left_400"
         },
-
-        # 3. Combined mouse + keyboard
         {
             "keyboard": {"conditions": ["ctrl"]},
             "mouse": {
@@ -59,20 +47,15 @@ def main():
         },
     ]
 
+    running = True
 
-    # -------------------------------------------------
-    # Event handler
-    # -------------------------------------------------
     def handle_event(event: ActionEvent):
+        nonlocal running
         logging.info(f"🔥 Triggered → {event.callback}")
 
         if event.callback == "exit":
-            global running
             running = False
 
-    # -------------------------------------------------
-    # Startup Info (Very Important)
-    # -------------------------------------------------
     print("\nShortcut Engine Demo")
     print("-" * 30)
     print("1. Press ESC → exit")
@@ -81,10 +64,8 @@ def main():
     print("-" * 30)
     print("Perform gestures now...\n")
 
-
     engine = ShortcutEngine(config, handle_event)
 
-    running = True
     engine.start()
 
     while running:

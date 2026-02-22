@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "shortcut-engine"
-version = "0.1.0"
+version = "0.1.1"
 description = "A deterministic, rate-controlled shortcut detection engine for keyboard and mouse events."
 readme = "README.md"
 requires-python = ">=3.12"

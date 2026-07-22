@@ -1,84 +1,151 @@
-import logging
 import inspect
+import logging
 
-from typing import Any, Optional, Type
-from .models import LogicResult, CallbackConfig, LogicProtocol, ActionProtocol, T, C
+from typing import Any, Optional, TypeVar
 
-# ==============================
-# Registry with helper and introspection
-# ==============================
+from .models import (
+    LogicResult,
+    PluginManifest,
+    LogicProtocol,
+    ActionProtocol,
+)
+
+_C = TypeVar("_C")
+
+
 class ActionDispatcher:
     """
     Central registry for callbacks.
-    Uses introspection to dynamically instantiate Logic/Action
-    without manually specifying dependencies.
+
+    Responsible for:
+        - Registering callbacks
+        - Instantiating Logic/Action
+        - Injecting dependencies
+        - Executing callbacks
     """
 
     def __init__(
-            self,
-            dependency_mapping: dict[str, object],
-        ):
-        # Mapping of callback key -> CallbackConfig
-        self._registry: dict[str, CallbackConfig[Any]] = {}
+        self,
+        dependencies: dict[str, object],
+    ) -> None:
+        self._registry: dict[str, PluginManifest] = {}
 
-        # Mapping of dependency name -> actual object
-        # This will be used by introspection to inject dependencies
-        self.dependency_mapping = dependency_mapping
+        self._dependencies = dependencies
+
+        # Cache constructor parameter names
+        self._ctor_cache: dict[type, tuple[str, ...]] = {}
+
+    # ==========================================================
+    # Registry
+    # ==========================================================
 
     def register(
         self,
         key: str,
-        logic: Type[LogicProtocol[T]],
-        action: Type[ActionProtocol[T]],
-        status: bool = True,
-        notification: bool = True,
-    ):
+        manifest: PluginManifest,
+    ) -> None:
         """
-        Helper to register a callback in a concise way.
+        Register a callback.
 
         Example:
-            registry.register_callback("pause", LogicPause, ActionPause)
+            dispatcher.register(
+                "pause",
+                create_manifest(...),
+            )
         """
-        self._registry[key] = CallbackConfig(
-            logic=logic,
-            action=action,
-            status=status,
-            notification=notification,
-        )
+        self._registry[key] = manifest
 
-    def get(self, key: str) -> Optional[CallbackConfig[Any]]:
+    def unregister(
+        self,
+        key: str,
+    ) -> None:
+        self._registry.pop(key, None)
+
+    def clear(self) -> None:
+        self._registry.clear()
+
+    def set_dependencies(
+        self,
+        dependencies: dict[str, object],
+    ) -> None:
+        """
+        Replace dependency mapping.
+
+        Useful when runtime services are recreated.
+        """
+        self._dependencies = dependencies
+
+    def get(
+        self,
+        key: str,
+    ) -> Optional[PluginManifest]:
         return self._registry.get(key)
 
-    # ===== Dynamic instantiation =====
-    def _instantiate(self, cls: Type[C]) -> C:
-        sig = inspect.signature(cls.__init__)
-        param_names = [
-            p.name for p in sig.parameters.values()
-            if p.name != "self"
-        ]
-        args = [self.dependency_mapping[name] for name in param_names]
+    # ==========================================================
+    # Dynamic Instantiation
+    # ==========================================================
+
+    def _instantiate(
+        self,
+        cls: type[_C],
+    ) -> _C:
+
+        param_names = self._ctor_cache.get(cls)
+
+        if param_names is None:
+            sig = inspect.signature(cls.__init__)
+            param_names = tuple(
+                p.name
+                for p in sig.parameters.values()
+                if p.name != "self"
+            )
+            self._ctor_cache[cls] = param_names
+
+        try:
+            args = [
+                self._dependencies[name]
+                for name in param_names
+            ]
+        except KeyError as exc:
+            raise RuntimeError(
+                f"Missing dependency '{exc.args[0]}' "
+                f"required by '{cls.__name__}'."
+            ) from None
+
         return cls(*args)
 
-    # ===== Callback execution =====
-    def execute_callback(self, cb_key: str) -> dict[str, str]:
+    # ==========================================================
+    # Execution
+    # ==========================================================
+
+    def execute(
+        self,
+        key: str,
+    ) -> dict[str, str]:
         """
-        Executes a callback: instantiate Logic, run it, instantiate Action, run it,
-        and optionally dispatch status/notification to UI.
+        Execute a callback.
         """
-        config = self.get(cb_key)
-        if not config:
-            logging.info(f"[CallbackRegistry] Unknown callback: {cb_key}")
+
+        manifest = self.get(key)
+
+        if manifest is None:
+            logging.info("Unknown callback: %s", key)
             return {"warning": "Unknown callback"}
 
-        # ===== Logic =====
-        logic_instance: LogicProtocol[Any] = self._instantiate(config.logic)
-        result: LogicResult[Any] = logic_instance.execute()
+        # Logic
+        logic: LogicProtocol[Any] = self._instantiate(manifest.logic)
+        result: LogicResult[Any] = logic.execute()
 
-        logging.info(f"Execute: {cb_key}, state: {result.ui_message}")
+        logging.info(
+            "Execute callback '%s' (%s)",
+            key,
+            result.ui_message,
+        )
 
-        # ===== Action =====
-        action_instance = self._instantiate(config.action)
-        action_instance.execute(result.payload)
+        # Action
+        action: ActionProtocol[Any] = self._instantiate(manifest.action)
+        action.execute(result.payload)
 
-        # ===== UI updates =====
-        return {"ui_message": result.ui_message}
+        return {
+            "ui_message": result.ui_message,
+        }

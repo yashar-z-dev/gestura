@@ -1,69 +1,93 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
-from typing import Protocol, TypeVar, Generic, Type
+from typing import Generic, Protocol, TypeVar, Any
 
-# ==============================
+# ==========================================================
 # Type Variables
-# ==============================
+# ==========================================================
 
-# T_co: covariant type produced by Logic (Logic → payload)
-T_co = TypeVar("T_co", covariant=True)
-# T_contra: contravariant type consumed by Action (Action ← payload)
-T_contra = TypeVar("T_contra", contravariant=True)
 T = TypeVar("T")
-C = TypeVar("C")
+T_co = TypeVar("T_co", covariant=True)
+T_contra = TypeVar("T_contra", contravariant=True)
 
-# ==============================
-# LogicResult: wrapper for Logic output
-# ==============================
+
+# ==========================================================
+# Logic Result
+# ==========================================================
 
 @dataclass(frozen=True, slots=True)
 class LogicResult(Generic[T_co]):
     """
-    The result of a Logic execution.
-
-    Attributes:
-        ui_message: message to show in UI
-        payload: data to pass to Action
+    Result produced by a Logic.
     """
+
     ui_message: str
     payload: T_co
 
-# ==============================
+
+# ==========================================================
 # Protocols
-# ==============================
+# ==========================================================
 
 class LogicProtocol(Protocol[T_co]):
     """
-    Logic is a pure computation unit.
-    All dependencies should be injected in __init__.
-    execute() should NOT take parameters.
+    Pure computation.
     """
+
     def execute(self) -> LogicResult[T_co]:
         ...
 
+
 class ActionProtocol(Protocol[T_contra]):
     """
-    Action consumes Logic output (payload) and performs side-effects.
-    execute() MUST take payload as input.
+    Performs side-effects.
     """
+
     def execute(self, payload: T_contra) -> None:
         ...
 
-# ==============================
-# Callback Configuration
-# ==============================
-@dataclass(frozen=True, slots=True)
-class CallbackConfig(Generic[T]):
-    """
-    Defines a callback pairing Logic and Action.
 
-    Attributes:
-        logic: class implementing LogicProtocol
-        action: class implementing ActionProtocol
-        status: whether to show status in UI
-        notification: whether to trigger notification
+# ==========================================================
+# Manifest
+# ==========================================================
+
+@dataclass(frozen=True, slots=True)
+class PluginManifest:
     """
-    logic: Type[LogicProtocol[T]]
-    action: Type[ActionProtocol[T]]
-    status: bool = True
-    notification: bool = True
+    Immutable description of a plugin.
+
+    Instances should be created only through create_manifest().
+    """
+
+    logic: type[LogicProtocol[Any]]
+    action: type[ActionProtocol[Any]]
+
+    status: bool
+    notification: bool
+
+
+# ==========================================================
+# Factory
+# ==========================================================
+
+def create_manifest(
+    *,
+    logic: type[LogicProtocol[T]],
+    action: type[ActionProtocol[T]],
+    status: bool = True,
+    notification: bool = True,
+) -> PluginManifest:
+    """
+    Creates a type-safe PluginManifest.
+
+    The type checker guarantees that Logic and Action
+    agree on the payload type.
+    """
+
+    return PluginManifest(
+        logic=logic,
+        action=action,
+        status=status,
+        notification=notification,
+    )

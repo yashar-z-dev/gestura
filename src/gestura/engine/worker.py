@@ -1,8 +1,10 @@
-from typing import Callable, Dict
-import logging, threading, queue
+import logging
+import queue
+import threading
+from typing import Callable
 
 from ..config import ShortcutConfig
-from ..models.policy import TriggerEvent, ActionEvent
+from ..models.policy import ActionEvent, TriggerEvent
 
 
 class ShortcutWorker:
@@ -29,8 +31,8 @@ class ShortcutWorker:
         self.func_now: Callable[[], float] = config.func_now
 
         # Store recent source timestamps for combined logic
-        self._recent_keyboard: Dict[str, float] = {}
-        self._recent_mouse: Dict[str, float] = {}
+        self._recent_keyboard: dict[str, float] = {}
+        self._recent_mouse: dict[str, float] = {}
 
         self._queue: queue.Queue[TriggerEvent] = queue.Queue()
 
@@ -66,12 +68,12 @@ class ShortcutWorker:
     def submit_keyboard_triggers(self, callbacks: list[str]) -> None:
         now = self.func_now()
         for cb in callbacks:
-            self._queue.put((TriggerEvent("keyboard", cb, now)))
+            self._queue.put(TriggerEvent("keyboard", cb, now))
 
     def submit_mouse_triggers(self, callbacks: list[str]) -> None:
         now = self.func_now()
         for cb in callbacks:
-            self._queue.put((TriggerEvent("mouse", cb, now)))
+            self._queue.put(TriggerEvent("mouse", cb, now))
 
     # ------------------------------------------------------------------
     # Main loop
@@ -91,7 +93,7 @@ class ShortcutWorker:
             try:
                 self._handle_trigger(_TriggerEvent)
             except Exception:
-                logging.exception(f"[ShortcutWorker] Error handling trigger: {_TriggerEvent}")
+                logging.exception(f"[ShortcutWorker] Error handling trigger: {_TriggerEvent}")  # noqa: LOG015
 
     # ------------------------------------------------------------------
     # Trigger dispatcher

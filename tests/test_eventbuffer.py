@@ -1,5 +1,4 @@
 from gestura.input.event_buffer import EventBuffer
-import pytest
 
 
 class FakeClock:

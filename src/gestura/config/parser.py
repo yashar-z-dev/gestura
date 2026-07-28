@@ -34,6 +34,7 @@ class ShortcutConfigBundle:
 # Worker Map
 # -------------------------
 
+
 @dataclass(frozen=True, slots=True)
 class WorkerGestureMap:
     keyboard_only: set[str]
@@ -59,16 +60,13 @@ def _build_worker_map(_GesturesMap: GesturesMap) -> WorkerGestureMap:
     keyboard_only = keyboard_callbacks - combo
     mouse_only = mouse_callbacks - combo
 
-    return WorkerGestureMap(
-        keyboard_only=keyboard_only,
-        mouse_only=mouse_only,
-        combo=combo
-    )
+    return WorkerGestureMap(keyboard_only=keyboard_only, mouse_only=mouse_only, combo=combo)
 
 
 # -------------------------
 # Policy Builder
 # -------------------------
+
 
 def _build_policy_map(config: list[dict[str, Any]]) -> dict[str, CallbackPolicy]:
     """
@@ -85,7 +83,7 @@ def _build_policy_map(config: list[dict[str, Any]]) -> dict[str, CallbackPolicy]
         policy_map[callback] = CallbackPolicy(
             cooldown_seconds=policy_cfg.get("cooldown_seconds", 0.0),
             rate_window_seconds=policy_cfg.get("rate_window_seconds", 1.0),
-            max_triggers=policy_cfg.get("max_triggers", 1)
+            max_triggers=policy_cfg.get("max_triggers", 1),
         )
 
     return policy_map
@@ -109,25 +107,12 @@ def _buil_gesters_map(config: list[dict[str, Any]]) -> GesturesMap:
         mouse_conditions = item.get("mouse", {}).get("conditions", [])
 
         if keyboard_conditions:
-            keyboard_list.append(
-                GestureKeyboardCondition(
-                    conditions=keyboard_conditions,
-                    callback=callback
-                )
-            )
+            keyboard_list.append(GestureKeyboardCondition(conditions=keyboard_conditions, callback=callback))
 
         if mouse_conditions:
-            mouse_list.append(
-                GestureMouseCondition(
-                    conditions=mouse_conditions,
-                    callback=callback
-                )
-            )
+            mouse_list.append(GestureMouseCondition(conditions=mouse_conditions, callback=callback))
 
-    return GesturesMap(
-        keyboard_gestures=keyboard_list,
-        mouse_gestures=mouse_list
-    )
+    return GesturesMap(keyboard_gestures=keyboard_list, mouse_gestures=mouse_list)
 
 
 def parse_shortcut_config(config: list[dict[str, Any]]) -> ShortcutConfigBundle:
@@ -144,5 +129,5 @@ def parse_shortcut_config(config: list[dict[str, Any]]) -> ShortcutConfigBundle:
         keyboard_gestures=_gesters_map.keyboard_gestures,
         mouse_gestures=_gesters_map.mouse_gestures,
         worker_map=worker_map,
-        policies=policy_map
+        policies=policy_map,
     )

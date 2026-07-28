@@ -1,24 +1,28 @@
-from typing import Any
-from pathlib import Path
 import json
 import logging
 import time
+from pathlib import Path
+from typing import Any
+
+# Action definition
+from exit import Action_Exit, Logic_Exit
+from pause import Action_Pause, Logic_Pause
 
 # API
 from gestura import GesturaEngine
 
 # Integration
-from gestura.integration.action_bus import ActionBus
-from gestura.integration.action_dispatcher import ActionDispatcher
-
-# Action definition
-from exit import Logic_Exit, Action_Exit
-from pause import Logic_Pause, Action_Pause
+from gestura.integration import (
+    ActionBus,
+    ActionDispatcher,
+    PluginManifest,
+)
 
 
 class AppState:
     def __init__(self):
         self.fake_state = True
+
 
 class main:
     def __init__(self):
@@ -49,17 +53,24 @@ class main:
             "app_state": self.app_state,
             "_GesturaEngine": self._GesturaEngine,
             "_ActionBus": self._ActionBus,
-            }
+        }
 
     def register_callbacks(self):
-        self._ActionDispatcher.register("exit", Logic_Exit, Action_Exit)
-        self._ActionDispatcher.register("pause", Logic_Pause, Action_Pause)
+
+        self._ActionDispatcher.register(
+            key="exit",
+            manifest=PluginManifest(logic=Logic_Exit, action=Action_Exit, status=True, notification=True),
+        )
+        self._ActionDispatcher.register(
+            key="pause",
+            manifest=PluginManifest(logic=Logic_Pause, action=Action_Pause, status=True, notification=True),
+        )
 
     # ===== start =====#
     def pump_worker_events(self):
         for cb_key in self._ActionBus.drain():
             # Execute action
-            self._ActionDispatcher.execute_callback(cb_key)
+            self._ActionDispatcher.execute(cb_key)
 
     def _loop(self):
         while self.running:
@@ -68,10 +79,11 @@ class main:
             time.sleep(0.01)
 
     def start(self):
-        logging.info("Engine is Started...")
+        logging.info("Engine is Started...")  # noqa: LOG015
         self.app_state(True)
         self._GesturaEngine.start()
         self._loop()
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)

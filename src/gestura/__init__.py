@@ -1,15 +1,16 @@
-from .engine.engine import GesturaEngine, ActionEvent
-
+from .engine.engine import ActionEvent, GesturaEngine
 from .models.inputs import (
+    KeyboardEvent,
+    MouseClickEvent,
     MouseEvent,
     MouseMoveEvent,
-    MouseClickEvent,
-    KeyboardEvent,
 )
 
-
 __all__ = [
-    "GesturaEngine", "ActionEvent",
-    "MouseEvent", "MouseMoveEvent", "MouseClickEvent",
+    "ActionEvent",
+    "GesturaEngine",
     "KeyboardEvent",
+    "MouseClickEvent",
+    "MouseEvent",
+    "MouseMoveEvent",
 ]

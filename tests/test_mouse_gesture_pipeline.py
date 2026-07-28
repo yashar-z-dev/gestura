@@ -1,8 +1,6 @@
 from gestura.input.mouse.pipeline import MouseGesturePipeline
-from gestura.models.mouse import GestureMouseCondition
 from gestura.models.event import EventData_move
-
-import pytest
+from gestura.models.mouse import GestureMouseCondition
 
 
 def test_single_segment_match():
@@ -194,7 +192,7 @@ def test_small_jitter_should_not_break_segment():
     batch = [
         EventData_move(id=1, x=0, y=0),
         EventData_move(id=2, x=10, y=0),
-        EventData_move(id=3, x=5, y=0),   # small jitter back
+        EventData_move(id=3, x=5, y=0),  # small jitter back
         EventData_move(id=4, x=40, y=0),
         EventData_move(id=5, x=120, y=0),
     ]
@@ -284,10 +282,7 @@ def test_large_batch_does_not_break():
 
     pipe = MouseGesturePipeline([gesture], 5)
 
-    batch = [
-        EventData_move(id=i, x=i*5, y=0)
-        for i in range(100)
-    ]
+    batch = [EventData_move(id=i, x=i * 5, y=0) for i in range(100)]
 
     result = pipe.process_for_trigger(batch)
 
@@ -333,7 +328,7 @@ def test_large_reverse_jump_is_not_ignored():
     batch = [
         EventData_move(id=1, x=0, y=0),
         EventData_move(id=2, x=100, y=0),
-        EventData_move(id=3, x=0, y=0),   # large jump back
+        EventData_move(id=3, x=0, y=0),  # large jump back
     ]
 
     result = pipeline.process_for_trigger(batch)
@@ -354,9 +349,9 @@ def test_mouse_pipeline_requires_correct_first_direction():
 
     pipeline = MouseGesturePipeline([gesture], 5)
     batch = [
-        EventData_move(id=1, x= 0, y=0),
+        EventData_move(id=1, x=0, y=0),
         EventData_move(id=2, x=100, y=100),
-        EventData_move(id=3, x= 0, y= 0),
+        EventData_move(id=3, x=0, y=0),
     ]
 
     result = pipeline.process_for_trigger(batch)

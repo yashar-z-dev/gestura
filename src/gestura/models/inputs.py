@@ -7,11 +7,13 @@ class KeyboardEvent:
     key: str
     press: bool
 
+
 # Mouse
 @dataclass(frozen=True, slots=True, kw_only=True)
 class MouseMoveEvent:
     x: int
     y: int
+
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class MouseClickEvent:
@@ -19,5 +21,6 @@ class MouseClickEvent:
     y: int
     position: str
     press: bool
+
 
 MouseEvent = MouseMoveEvent | MouseClickEvent

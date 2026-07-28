@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gestura"
-version = "3.0.0"
+version = "3.1.0"
 description = "A deterministic, rate-controlled shortcut detection engine for keyboard and mouse events."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12,<3.13"
 license = { file = "LICENSE" }
 
 authors = [
@@ -67,3 +67,31 @@ gestura = ["py.typed"]
 
 [project.scripts]
 gestura-demo = "gestura.demo:main"
+
+[tool.ruff]
+
+target-version = "py313"
+line-length = 111
+
+[tool.ruff.lint]
+
+select = [
+    # pycodestyle
+    "E",
+
+    # Pyflakes
+    "F",
+]
+
+# Future:
+#
+# "I"   Import sorting
+# "UP"  Python upgrades
+# "B"   Bugbear
+# "SIM" Simplifications
+# "PERF"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true

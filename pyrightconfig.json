@@ -1,20 +1,38 @@
 {
     "typeCheckingMode": "strict",
+    "useLibraryCodeForTypes": true,
     "reportMissingImports": true,
     "reportMissingTypeStubs": false,
-    "reportMissingParameterType": true,
-    "reportUnknownLambdaType": true,
-    "reportUnknownVariableType": false,
-    "reportUnknownMemberType": false,
-    "reportUnknownArgumentType": false,
-    "reportUnknownParameterType": false,
-    "reportUnusedImport": true,
-    "reportUnusedVariable": true,
-    "reportPrivateUsage": true,
-    "reportIncompatibleMethodOverride": true,
-    "reportInconsistentConstructor": true,
-    "reportUnnecessaryTypeIgnoreComment": true,
-    // Optional
-    "reportImplicitOverride": true,
-    "reportUninitializedInstanceVariable": true
+    "reportUnusedImport": "none",
+    "reportUnusedVariable": "error",
+    "reportPrivateUsage": "error",
+    "reportUnknownVariableType": "error",
+    "reportUnknownMemberType": "error",
+    "reportUnknownArgumentType": "error",
+    "reportUnknownParameterType": "error",
+    "reportMissingParameterType": "error",
+    "include": [
+        "src/behavior"
+    ],
+    "exclude": [
+        "**/__pycache__",
+        "**/.venv",
+        "**/node_modules",
+        "**/.*",
+        "src/behavior/UI/**",
+        "src/behavior/plugins/**"
+    ],
+    "executionEnvironments": [
+        {
+            "root": "tests",
+            "reportUnknownParameterType": "none",
+            "reportMissingParameterType": "none",
+            "reportUnknownVariableType": "none",
+            "reportUnknownMemberType": "none",
+            "reportUnknownArgumentType": "none",
+            "reportUnknownLambdaType": "none",
+            "reportCallIssue": "none",
+            "reportArgumentType": "none"
+        }
+    ]
 }

@@ -1,5 +1,5 @@
-import threading
 import queue
+import threading
 
 from ..models.policy import ActionEvent
 
@@ -13,10 +13,10 @@ class ActionBus:
         with self._lock:
             if self._queue.full():
                 try:
-                    self._queue.get_nowait() # drop oldest
+                    self._queue.get_nowait()  # drop oldest
                 except queue.Empty:
                     pass
-            self._queue.put_nowait(action.callback) # str
+            self._queue.put_nowait(action.callback)  # str
 
     def drain(self) -> list[str]:
         actions: list[str] = []

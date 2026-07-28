@@ -4,9 +4,9 @@
 TriggerEvent  →  Policy  →  ActionEvent
 """
 
+from collections import deque
 from dataclasses import dataclass, field
 from typing import Literal, Protocol
-from collections import deque
 
 
 @dataclass(frozen=True, slots=True)

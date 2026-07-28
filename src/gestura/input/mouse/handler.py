@@ -1,11 +1,11 @@
 import logging
-from typing import Callable, Optional
+from typing import Callable
 
-from ...models.inputs import MouseEvent, MouseMoveEvent
 from ...config import MouseConfig
-from ...models.event import EventData_click, MouseButtons, EventData_move
-from .pipeline import MouseGesturePipeline
+from ...models.event import EventData_click, EventData_move, MouseButtons
+from ...models.inputs import MouseEvent, MouseMoveEvent
 from ..event_buffer import EventBuffer
+from .pipeline import MouseGesturePipeline
 
 
 class MouseApp:
@@ -20,8 +20,8 @@ class MouseApp:
     """
 
     def __init__(self, config: MouseConfig) -> None:
-        self._move_counter: int = 0    # incremental id
-        self._move_event_id: int = 0   # incremental id
+        self._move_counter: int = 0  # incremental id
+        self._move_event_id: int = 0  # incremental id
         self._click_event_id: int = 0  # incremental id
         self._rate_frequency: int = 1  # frequency rate filtering for low-performance
 
@@ -30,8 +30,7 @@ class MouseApp:
 
         # Pipeline handles all recognition logic
         self._pipeline = MouseGesturePipeline(
-            gesture_definitions=config.gestures,
-            segment_min_delta=config.min_delta
+            gesture_definitions=config.gestures, segment_min_delta=config.min_delta
         )
 
         # Time-sliced event buffer
@@ -40,7 +39,7 @@ class MouseApp:
     # ------------------------------------------------------------------ #
     # Validator
     # ------------------------------------------------------------------ #
-    def _validator(self, event: MouseEvent) -> Optional[EventData_move | EventData_click]:
+    def _validator(self, event: MouseEvent) -> EventData_move | EventData_click | None:
         """
         Generate EventData_move | EventData_click private models.
         """
@@ -48,7 +47,7 @@ class MouseApp:
         # Filter negative coordinates
         if event.x < 0 or event.y < 0:
             # warning (most apply map for negative values, some time rate negative so hight)
-            logging.debug(f"Ignored unsupported mouse negative; x={event.x}, y={event.y}")
+            logging.debug(f"Ignored unsupported mouse negative; x={event.x}, y={event.y}")  # noqa: LOG015
             return
 
         # Detected move or click
@@ -68,26 +67,24 @@ class MouseApp:
             try:
                 valid_event = EventData_click(
                     id=self._click_event_id,
-                    x=event.x, y=event.y,
+                    x=event.x,
+                    y=event.y,
                     position=MouseButtons(event.position),
-                    press=event.press
+                    press=event.press,
                 )
             except ValueError:
-                logging.warning("Ignored unsupported mouse position button: %s", event.position)
+                logging.warning("Ignored unsupported mouse position button: %s", event.position)  # noqa: LOG015
                 return
 
             self._click_event_id += 1
 
         return valid_event
-    
+
     def should_skip_move(self) -> bool:
-        """ frequency filter move """
+        """frequency filter move"""
         self._move_counter += 1
         # Apply sampling rate
-        if self._move_counter % self._rate_frequency != 0:
-            return True
-
-        return False
+        return self._move_counter % self._rate_frequency != 0
 
     def _handle_move(self, event: EventData_move) -> None:
         """
@@ -103,8 +100,6 @@ class MouseApp:
         Click handling is currently not part of gesture recognition.
         Reserved for future extension.
         """
-
-        pass
 
     # ------------------------------------------------------------------ #
     # Core Processing

@@ -1,15 +1,14 @@
-from gestura.utils.key_normalizer import KeyUtils, Key, KeyCode
-import pytest
+from gestura.utils.key_normalizer import Key, KeyCode, KeyUtils
 
 
 def test_str_key():
 
-    assert KeyUtils.parse_key('\x0c', 'str') == "l"
-    assert KeyUtils.parse_key('\x01', 'str') == "a"
-    assert KeyUtils.parse_key('\x0b', 'str') == "k"
-    assert KeyUtils.parse_key('0x01', 'str') == "a"
-    assert KeyUtils.parse_key('alt_gr', 'str') == "alt"
-    assert KeyUtils.parse_key('ctrl_l', 'str') == "ctrl"
+    assert KeyUtils.parse_key("\x0c", "str") == "l"
+    assert KeyUtils.parse_key("\x01", "str") == "a"
+    assert KeyUtils.parse_key("\x0b", "str") == "k"
+    assert KeyUtils.parse_key("0x01", "str") == "a"
+    assert KeyUtils.parse_key("alt_gr", "str") == "alt"
+    assert KeyUtils.parse_key("ctrl_l", "str") == "ctrl"
 
     assert KeyUtils.parse_key(key="ctrl", output_type="object") == Key.ctrl
     assert KeyUtils.parse_key(key="shift", output_type="object") == Key.shift
@@ -19,12 +18,12 @@ def test_str_key():
     assert KeyUtils.parse_key(key="home", output_type="object") == Key.home
     assert KeyUtils.parse_key(key="esc", output_type="object") == Key.esc
 
-    assert str(KeyUtils.parse_key(key=" ", output_type="object")) == "''" # TODO: most fix.
+    assert str(KeyUtils.parse_key(key=" ", output_type="object")) == "''"  # TODO: most fix.
     assert KeyUtils.parse_key(key="a", output_type="object") == KeyCode.from_char("a")
-    assert KeyUtils.parse_key(key="B", output_type="object") == KeyCode.from_char("b") # NOTE: return lower
+    assert KeyUtils.parse_key(key="B", output_type="object") == KeyCode.from_char("b")  # NOTE: return lower
 
 
 def test_type_key():
 
-    assert type(KeyUtils.parse_key(key="ctrl", output_type="object")) == Key
-    assert type(KeyUtils.parse_key(key=" ", output_type="object")) == KeyCode
+    assert type(KeyUtils.parse_key(key="ctrl", output_type="object")) is Key
+    assert type(KeyUtils.parse_key(key=" ", output_type="object")) is KeyCode

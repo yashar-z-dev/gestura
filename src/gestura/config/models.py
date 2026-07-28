@@ -1,13 +1,13 @@
 # 100/100
 
+import time
 from typing import Callable
 from dataclasses import dataclass, field
-import time
 
+from ..config.parser import WorkerGestureMap
 from ..models.keyboard import GestureKeyboardCondition
 from ..models.mouse import GestureMouseCondition
-from ..models.policy import PolicyEngineProtocol, ActionEvent
-from ..config.parser import WorkerGestureMap
+from ..models.policy import ActionEvent, PolicyEngineProtocol
 
 
 # ===== Models =====
@@ -28,14 +28,14 @@ class KeyboardConfig:
     ===== Usage Example =====:
         config = KeyboardConfig(
             gestures=[
-                {"conditions": ["alt", "space", "space"], 
+                {"conditions": ["alt", "space", "space"],
                  "callback": "Alt+Space+Space triggered"}
             ],
             on_trigger = print
         )
     """
 
-    gestures: list[GestureKeyboardCondition] = field(default_factory=list)
+    gestures: list[GestureKeyboardCondition] = field(default_factory=list[GestureKeyboardCondition])
     on_trigger: Callable[[list[str]], None] = lambda _: None
     BufferWindowSeconds: float = 1.5
 
@@ -69,7 +69,8 @@ class MouseConfig:
             on_trigger=print
         )
     """
-    gestures: list[GestureMouseCondition] = field(default_factory=list)
+
+    gestures: list[GestureMouseCondition] = field(default_factory=list[GestureMouseCondition])
     on_trigger: Callable[[list[str]], None] = lambda _: None
     BufferWindowSeconds: float = 4.0
     min_delta: float = 10.0

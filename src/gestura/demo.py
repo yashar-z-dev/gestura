@@ -1,22 +1,19 @@
 def main():
-    from typing import Any
     import logging
     import time
-    from gestura import GesturaEngine, ActionEvent
+    from typing import Any
+
+    from gestura import ActionEvent, GesturaEngine
 
     logging.basicConfig(level=logging.INFO)
 
-    DEFAULT_POLICY = {
-        "cooldown_seconds": 1.0,
-        "max_triggers": 1,
-        "rate_window_seconds": 5.0
-    }
+    DEFAULT_POLICY = {"cooldown_seconds": 1.0, "max_triggers": 1, "rate_window_seconds": 5.0}
     config: list[dict[str, Any]] = [
         {
             "keyboard": {"conditions": ["esc"]},
             "mouse": {"conditions": []},
             "policy": DEFAULT_POLICY,
-            "callback": "exit"
+            "callback": "exit",
         },
         {
             "keyboard": {"conditions": []},
@@ -26,24 +23,14 @@ def main():
                     {"axis": "x", "trend": "left", "min_delta": 400},
                 ]
             },
-            "policy": {
-                **DEFAULT_POLICY,
-                "cooldown_seconds": 2.0
-            },
-            "callback": "mouse_up_100_then_left_400"
+            "policy": {**DEFAULT_POLICY, "cooldown_seconds": 2.0},
+            "callback": "mouse_up_100_then_left_400",
         },
         {
             "keyboard": {"conditions": ["ctrl"]},
-            "mouse": {
-                "conditions": [
-                    {"axis": "y", "trend": "down", "min_delta": 20}
-                ]
-            },
-            "policy": {
-                **DEFAULT_POLICY,
-                "cooldown_seconds": 2.0
-            },
-            "callback": "ctrl_plus_mouse_down_20"
+            "mouse": {"conditions": [{"axis": "y", "trend": "down", "min_delta": 20}]},
+            "policy": {**DEFAULT_POLICY, "cooldown_seconds": 2.0},
+            "callback": "ctrl_plus_mouse_down_20",
         },
     ]
 
@@ -51,7 +38,7 @@ def main():
 
     def handle_event(event: ActionEvent):
         nonlocal running
-        logging.info(f"🔥 Triggered → {event.callback}")
+        logging.info(f"🔥 Triggered → {event.callback}")  # noqa: LOG015
 
         if event.callback == "exit":
             running = False

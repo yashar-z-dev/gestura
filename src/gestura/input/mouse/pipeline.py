@@ -6,10 +6,10 @@ tests:
 """
 
 import logging
-from typing import Any, Tuple, Optional
+from typing import Any
 
-from ...models.mouse import GestureMouseCondition
 from ...models.event import EventData_move
+from ...models.mouse import GestureMouseCondition
 
 
 class MouseGestureDetector:
@@ -23,7 +23,7 @@ class MouseGestureDetector:
         self,
         gesture_definitions: list[GestureMouseCondition],
         segment_min_delta: float,
-        jitter_max_delta: Optional[float] = None,
+        jitter_max_delta: float | None = None,
         lookahead: int = 2,
     ):
         self.gesture_definitions = gesture_definitions
@@ -31,7 +31,7 @@ class MouseGestureDetector:
         self.jitter_max_delta = jitter_max_delta or segment_min_delta
         self.lookahead = lookahead
 
-        self._first_condition_index: dict[Tuple[str, str], list[GestureMouseCondition]] = {}
+        self._first_condition_index: dict[tuple[str, str], list[GestureMouseCondition]] = {}
         self._build_first_condition_index()
 
     # ============================================================
@@ -48,7 +48,7 @@ class MouseGestureDetector:
     # SEGMENT EXTRACTION
     # ============================================================
 
-    def _movement_trend(self, axis: str, delta: float) -> Optional[str]:
+    def _movement_trend(self, axis: str, delta: float) -> str | None:
         if delta == 0:
             return None
         if axis == "x":
@@ -62,12 +62,9 @@ class MouseGestureDetector:
 
         segments.sort(key=lambda s: s["start_id"])
 
-        logging.debug(
+        logging.debug(  # noqa: LOG015
             "[Segments] %s",
-            [
-                f"{s['axis']}:{s['trend']} Δ{s['delta']} ({s['start_id']}→{s['end_id']})"
-                for s in segments
-            ]
+            [f"{s['axis']}:{s['trend']} Δ{s['delta']} ({s['start_id']}→{s['end_id']})" for s in segments],
         )
 
         return segments
@@ -82,10 +79,9 @@ class MouseGestureDetector:
 
         start_index = 0
         start_value = getattr(events[0], axis)
-        current_trend: Optional[str] = None
+        current_trend: str | None = None
 
         for i in range(1, len(events)):
-
             prev = events[i - 1]
             curr = events[i]
 
@@ -100,8 +96,7 @@ class MouseGestureDetector:
                 continue
 
             if new_trend != current_trend:
-
-                logging.debug(
+                logging.debug(  # noqa: LOG015
                     "[TrendChange] axis=%s id=%s %s→%s",
                     axis,
                     curr.id,
@@ -123,13 +118,15 @@ class MouseGestureDetector:
                 delta_total = abs(getattr(prev, axis) - start_value)
 
                 if delta_total >= self.segment_min_delta:
-                    segments.append({
-                        "start_id": events[start_index].id,
-                        "end_id": prev.id,
-                        "axis": axis,
-                        "trend": current_trend,
-                        "delta": int(delta_total),
-                    })
+                    segments.append(
+                        {
+                            "start_id": events[start_index].id,
+                            "end_id": prev.id,
+                            "axis": axis,
+                            "trend": current_trend,
+                            "delta": int(delta_total),
+                        }
+                    )
 
                 start_index = i - 1
                 start_value = getattr(prev, axis)
@@ -140,13 +137,15 @@ class MouseGestureDetector:
             delta_total = abs(getattr(events[-1], axis) - start_value)
 
             if delta_total >= self.segment_min_delta:
-                segments.append({
-                    "start_id": events[start_index].id,
-                    "end_id": events[-1].id,
-                    "axis": axis,
-                    "trend": current_trend,
-                    "delta": int(delta_total),
-                })
+                segments.append(
+                    {
+                        "start_id": events[start_index].id,
+                        "end_id": events[-1].id,
+                        "axis": axis,
+                        "trend": current_trend,
+                        "delta": int(delta_total),
+                    }
+                )
 
         return segments
 
@@ -164,7 +163,7 @@ class MouseGestureDetector:
 
         # 1️⃣ Large jump → always real
         if abs(delta) >= self.jitter_max_delta:
-            logging.debug(
+            logging.debug(  # noqa: LOG015
                 "[Reversal] Large jump axis=%s id=%s Δ=%s → REAL",
                 axis,
                 events[index].id,
@@ -185,7 +184,7 @@ class MouseGestureDetector:
             if trend == opposite_trend:
                 confirm += 1
             elif trend == current_trend:
-                logging.debug(
+                logging.debug(  # noqa: LOG015
                     "[Reversal] JITTER axis=%s id=%s → ignored",
                     axis,
                     events[index].id,
@@ -193,14 +192,14 @@ class MouseGestureDetector:
                 return False
 
         if confirm >= self.lookahead:
-            logging.debug(
+            logging.debug(  # noqa: LOG015
                 "[Reversal] Confirmed axis=%s id=%s → REAL",
                 axis,
                 events[index].id,
             )
             return True
 
-        logging.debug(
+        logging.debug(  # noqa: LOG015
             "[Reversal] Not enough confirmation axis=%s id=%s → JITTER",
             axis,
             events[index].id,
@@ -216,39 +215,30 @@ class MouseGestureDetector:
         segments: list[dict[str, Any]],
         gesture: GestureMouseCondition,
         start_segment: dict[str, Any],
-    ) -> Optional[int]:
+    ) -> int | None:
 
         last_end_id = start_segment["end_id"]
 
         for cond in gesture.conditions[1:]:
-
             found = False
 
             for seg in segments:
                 if seg["end_id"] < last_end_id:
                     continue
 
-                if (
-                    seg["axis"] == cond.axis
-                    and seg["trend"] == cond.trend
-                    and seg["delta"] >= cond.min_delta
-                ):
+                if seg["axis"] == cond.axis and seg["trend"] == cond.trend and seg["delta"] >= cond.min_delta:
                     last_end_id = seg["end_id"]
                     found = True
                     break
 
             if not found:
-                logging.debug(
-                    "[MatchFail] %s failed at condition %s",
-                    gesture.callback,
-                    cond
+                logging.debug(  # noqa: LOG015
+                    "[MatchFail] %s failed at condition %s", gesture.callback, cond
                 )
                 return None
 
-        logging.debug(
-            "[MatchSuccess] %s ending at id=%s",
-            gesture.callback,
-            last_end_id
+        logging.debug(  # noqa: LOG015
+            "[MatchSuccess] %s ending at id=%s", gesture.callback, last_end_id
         )
 
         return last_end_id
@@ -257,24 +247,22 @@ class MouseGestureDetector:
     # PUBLIC
     # ============================================================
 
-    def detect(self, events: list[EventData_move]) -> list[Tuple[str, int]]:
+    def detect(self, events: list[EventData_move]) -> list[tuple[str, int]]:
         """
         Returns raw (callback, occurrence_end_id)
         """
 
-        occurrences: list[Tuple[str, int]] = []
+        occurrences: list[tuple[str, int]] = []
 
         segments = self.extract_segments(events)
         if not segments:
             return occurrences
 
         for seg in segments:
-
             key = (seg["axis"], seg["trend"])
             candidates = self._first_condition_index.get(key, [])
 
             for gesture in candidates:
-
                 first = gesture.conditions[0]
 
                 if seg["delta"] < first.min_delta:
@@ -297,22 +285,15 @@ class MouseGestureOccurrenceFilter:
     def __init__(self):
         self._last_occurrence_end_id: dict[str, int] = {}
 
-    def filter(
-        self,
-        occurrences: list[Tuple[str, int]]
-    ) -> list[str]:
+    def filter(self, occurrences: list[tuple[str, int]]) -> list[str]:
 
         triggered: list[str] = []
 
         for callback, end_id in occurrences:
-
             last = self._last_occurrence_end_id.get(callback)
 
-            logging.debug(
-                "[OccurrenceCheck] %s last=%s new=%s",
-                callback,
-                last,
-                end_id
+            logging.debug(  # noqa: LOG015
+                "[OccurrenceCheck] %s last=%s new=%s", callback, last, end_id
             )
 
             if last is None or end_id > last:
@@ -323,7 +304,6 @@ class MouseGestureOccurrenceFilter:
 
 
 class MouseGesturePipeline:
-
     def __init__(self, gesture_definitions: list[GestureMouseCondition], segment_min_delta: float):
         self.detector = MouseGestureDetector(
             gesture_definitions=gesture_definitions,

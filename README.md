@@ -56,7 +56,7 @@ config = [
         "keyboard": {"conditions": ["esc"]},
         "mouse": {"conditions": []},
         "policy": {"cooldown_seconds": 1.0},
-        "callback": "exit"
+        "callback": "exit",
     }
 ]
 ```
@@ -71,13 +71,9 @@ Trigger when user moves mouse **up at least 100px within 4 seconds**:
 config = [
     {
         "keyboard": {"conditions": []},
-        "mouse": {
-            "conditions": [
-                {"axis": "y", "trend": "up", "min_delta": 100}
-            ]
-        },
+        "mouse": {"conditions": [{"axis": "y", "trend": "up", "min_delta": 100}]},
         "policy": {"cooldown_seconds": 2.0},
-        "callback": "mouse_up_100"
+        "callback": "mouse_up_100",
     }
 ]
 ```
@@ -91,13 +87,9 @@ CTRL + move mouse DOWN 20px (order doesn't matter):
 ```python
 {
     "keyboard": {"conditions": ["ctrl"]},
-    "mouse": {
-        "conditions": [
-            {"axis": "y", "trend": "down", "min_delta": 20}
-        ]
-    },
+    "mouse": {"conditions": [{"axis": "y", "trend": "down", "min_delta": 20}]},
     "policy": {"cooldown_seconds": 2.0},
-    "callback": "ctrl_plus_mouse_down_20"
+    "callback": "ctrl_plus_mouse_down_20",
 }
 ```
 

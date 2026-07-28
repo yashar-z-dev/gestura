@@ -8,8 +8,9 @@ __all__ = (
 
 # NOTE: CPU 0.05% USE
 
-from typing import Iterable
-from pydantic import BaseModel, Field, ConfigDict
+from collections.abc import Iterable
+
+from pydantic import BaseModel, ConfigDict, Field
 
 
 # ========== Container model ==========
@@ -31,7 +32,8 @@ class GestureKeyboard(BaseModel):
         """
         version: date(2026-01-26)
 
-        NOTE: This method was created to standardize the project, otherwise there is no need for validation in this version.
+        NOTE: This method was created to standardize the project,
+            otherwise there is no need for validation in this version.
         Append without validate.
         :param data: Description
         :type data: str
@@ -39,11 +41,11 @@ class GestureKeyboard(BaseModel):
 
         if isinstance(data, list | tuple):
             self.conditions.extend(data)
-            return None
+            return
 
         # single item
         self.conditions.append(data)
-        return None
+        return
 
     # -------- alternative API --------
     def add(self, cond: str) -> None:
@@ -63,14 +65,14 @@ class GestureKeyboard(BaseModel):
         """
 
         self.conditions.extend(conds)
-    
+
     # -------- helpers --------
     def empty(self) -> None:
         """
-        Update and add new methods for get and filtering or sorting.        
+        Update and add new methods for get and filtering or sorting.
         """
 
-        return None
+        return
 
 
 # ===== SHORTCUT JSON Keyboard =====
@@ -78,7 +80,9 @@ class GestureKeyboardCondition(GestureKeyboard):
     """
     Define keyboard gestures for the conditions required to trigger the action.
 
-    :param callback: The name of the method to be executed when the gesture is triggered (TODO: most update for support Callable and read plugins)
+    :param callback: The name of the method to be executed when the gesture is triggered (
+        TODO: most update for support Callable and read plugins
+    )
     """
 
     callback: str = "Unknown"

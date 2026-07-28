@@ -1,9 +1,11 @@
 import time
 from typing import Callable
 
+from gestura import KeyboardEvent
+
 from ..adapters.pynput_adapters.keyboard_listener import KeyboardListener
 from ..utils.key_normalizer import KeyUtils
-from gestura import KeyboardEvent
+
 
 # ========== USEAGE ==========
 class KeyCollector:
@@ -61,7 +63,6 @@ if __name__ == "__main__":
     print(keys)
 
 
-
 # # ========== USEAGE ==========
 # def TEST_MouseListener():
 #     import time
@@ -79,7 +80,6 @@ if __name__ == "__main__":
 # # ----- TESTS -----
 # if __name__ == "__main__":
 #     TEST_MouseListener()
-
 
 
 # # # 100/100
@@ -101,7 +101,11 @@ if __name__ == "__main__":
 
 
 # # class MouseListener:
-# #     def __init__(self, on_event_callback: Callable[[EventData_click | EventData_move], None], rate: int) -> None:
+# #    def __init__(
+# #        self,
+# #        on_event_callback: Callable[[EventData_click | EventData_move], None],
+# #        rate: int
+# #    ) -> None:
 # #         """
 # #         on_event_callback: function called for every mouse event
 # #         """

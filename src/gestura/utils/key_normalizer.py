@@ -5,9 +5,9 @@ tests:
     test_key_utils.py
 """
 
-from typing import Optional, Union, Literal, overload
-from functools import lru_cache
 import re
+from functools import lru_cache
+from typing import Literal, overload
 
 from pynput.keyboard import Key, KeyCode
 
@@ -15,7 +15,7 @@ from pynput.keyboard import Key, KeyCode
 class KeyUtils:
     MODIFIER_PATTERN = re.compile(r".*(ctrl|control|shift|alt|cmd|win|meta).*", re.IGNORECASE)
 
-    SIMPLE_MODIFIERS = {
+    SIMPLE_MODIFIERS = {  # noqa: RUF012
         "ctrl": Key.ctrl,
         "control": Key.ctrl,
         "shift": Key.shift,
@@ -30,7 +30,7 @@ class KeyUtils:
     HEX_PATTERN = re.compile(r"^0x([0-9a-f]{2})$", re.IGNORECASE)
 
     @staticmethod
-    def is_modifier(key: Optional[Union[Key, KeyCode, str]]) -> bool:
+    def is_modifier(key: Key | KeyCode | str | None) -> bool:
         if key is None:
             return False
 
@@ -61,7 +61,7 @@ class KeyUtils:
 
     @staticmethod
     @lru_cache(maxsize=512)
-    def control_char_to_key(char: str) -> Optional[str]:
+    def control_char_to_key(char: str) -> str | None:
         if len(char) != 1:
             return None
         code = ord(char)
@@ -92,19 +92,18 @@ class KeyUtils:
 
     @overload
     @staticmethod
-    def normalize_key(key: Optional[Union[Key, KeyCode, str]], output_type: Literal["object"]) -> Union[Key, KeyCode]: ...
+    def normalize_key(key: Key | KeyCode | str | None, output_type: Literal["object"]) -> Key | KeyCode: ...
     @overload
     @staticmethod
-    def normalize_key(key: Optional[Union[Key, KeyCode, str]], output_type: Literal["str"]) -> str: ...
+    def normalize_key(key: Key | KeyCode | str | None, output_type: Literal["str"]) -> str: ...
     @overload
     @staticmethod
-    def normalize_key(key: Optional[Union[Key, KeyCode, str]], output_type: Literal["type"]) -> str: ...
+    def normalize_key(key: Key | KeyCode | str | None, output_type: Literal["type"]) -> str: ...
 
     @staticmethod
     def normalize_key(
-        key: Optional[Union[Key, KeyCode, str]],
-        output_type: Literal["object", "str", "type"] = "object"
-    ) -> Union[Key, KeyCode, str]:
+        key: Key | KeyCode | str | None, output_type: Literal["object", "str", "type"] = "object"
+    ) -> Key | KeyCode | str:
 
         if key is None:
             if output_type == "str":
@@ -117,8 +116,7 @@ class KeyUtils:
             name = key
 
             # Remove 'key.' prefix and surrounding quotes but do NOT strip (important for control chars)
-            if name.startswith("key."):
-                name = name[4:]
+            name = name.removeprefix("key.")
             if name.startswith("'") and name.endswith("'") and len(name) > 1:
                 name = name[1:-1]
 
@@ -140,7 +138,7 @@ class KeyUtils:
                 return KeyCode.from_char(norm_name if len(norm_name) == 1 else "")
 
         elif isinstance(key, Key):
-            base = str(key)[4:] if str(key).startswith("Key.") else str(key)
+            base = str(key).removeprefix("Key.")
             norm = KeyUtils.normalize_modifier_name(base)
             if output_type == "str":
                 return norm
@@ -162,17 +160,16 @@ class KeyUtils:
 
     @staticmethod
     @overload
-    def parse_key(key: Optional[Union[Key, KeyCode, str]], output_type: Literal["object"]) -> Union[Key, KeyCode]: ...
+    def parse_key(key: Key | KeyCode | str | None, output_type: Literal["object"]) -> Key | KeyCode: ...
     @staticmethod
     @overload
-    def parse_key(key: Optional[Union[Key, KeyCode, str]], output_type: Literal["str"]) -> str: ...
+    def parse_key(key: Key | KeyCode | str | None, output_type: Literal["str"]) -> str: ...
     @staticmethod
     @overload
-    def parse_key(key: Optional[Union[Key, KeyCode, str]], output_type: Literal["type"]) -> str: ...
+    def parse_key(key: Key | KeyCode | str | None, output_type: Literal["type"]) -> str: ...
 
     @staticmethod
     def parse_key(
-        key: Optional[Union[Key, KeyCode, str]],
-        output_type: Literal["object", "str", "type"] = "object"
-    ) -> Union[Key, KeyCode, str]:
+        key: Key | KeyCode | str | None, output_type: Literal["object", "str", "type"] = "object"
+    ) -> Key | KeyCode | str:
         return KeyUtils.normalize_key(key, output_type=output_type)

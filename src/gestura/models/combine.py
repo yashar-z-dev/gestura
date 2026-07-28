@@ -3,8 +3,8 @@
 from typing import Callable
 from dataclasses import dataclass, field
 
-from .mouse import GestureMouse
 from .keyboard import GestureKeyboard
+from .mouse import GestureMouse
 
 
 @dataclass(slots=True)

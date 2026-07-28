@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Generic, Protocol, TypeVar, Any
+from typing import Any, Generic, Protocol, TypeVar
 
 # ==========================================================
 # Type Variables
@@ -15,6 +15,7 @@ T_contra = TypeVar("T_contra", contravariant=True)
 # ==========================================================
 # Logic Result
 # ==========================================================
+
 
 @dataclass(frozen=True, slots=True)
 class LogicResult(Generic[T_co]):
@@ -30,13 +31,13 @@ class LogicResult(Generic[T_co]):
 # Protocols
 # ==========================================================
 
+
 class LogicProtocol(Protocol[T_co]):
     """
     Pure computation.
     """
 
-    def execute(self) -> LogicResult[T_co]:
-        ...
+    def execute(self) -> LogicResult[T_co]: ...
 
 
 class ActionProtocol(Protocol[T_contra]):
@@ -44,13 +45,13 @@ class ActionProtocol(Protocol[T_contra]):
     Performs side-effects.
     """
 
-    def execute(self, payload: T_contra) -> None:
-        ...
+    def execute(self, payload: T_contra) -> None: ...
 
 
 # ==========================================================
 # Manifest
 # ==========================================================
+
 
 @dataclass(frozen=True, slots=True)
 class PluginManifest:
@@ -70,6 +71,7 @@ class PluginManifest:
 # ==========================================================
 # Factory
 # ==========================================================
+
 
 def create_manifest(
     *,

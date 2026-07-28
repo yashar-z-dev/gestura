@@ -7,10 +7,11 @@ __all__ = (
     EventData_click, EventData_move
 """
 
-from typing import Optional, Literal, Union, Annotated
 from dataclasses import dataclass
-from pydantic import Field
 from enum import Enum
+from typing import Annotated, Literal
+
+from pydantic import Field
 
 
 # ===== EventData Models =====
@@ -21,8 +22,9 @@ class _Base_Event:
         id:   Primary key (sortable)
         time: Capture time(Optianl) (sortable)
     """
-    id:   Optional[int]   = None
-    time: Optional[float] = None
+
+    id: int | None = None
+    time: float | None = None
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -46,6 +48,7 @@ class MouseButtons(str, Enum):
     LEFT = "left"
     RIGHT = "right"
     MIDDLE = "middle"
+
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class EventData_click(_Base_Event):
@@ -79,6 +82,6 @@ class EventData_move(_Base_Event):
 
 # ===== Support Models =====
 __EVENTS__ = Annotated[
-    Union[EventData_keyboard, EventData_click, EventData_move],
+    EventData_keyboard | EventData_click | EventData_move,
     Field(discriminator="type"),
 ]

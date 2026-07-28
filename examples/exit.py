@@ -1,5 +1,6 @@
 # type: ignore
 import logging
+
 from gestura.integration.models import LogicResult
 
 
@@ -12,16 +13,13 @@ class Logic_Exit:
 
 
 class Action_Exit:
-    def __init__(
-        self,
-        _GesturaEngine,
-        app_state):
+    def __init__(self, _GesturaEngine, app_state):
 
         self._GesturaEngine = _GesturaEngine
         self.app_state = app_state
 
     def execute(self, payload) -> None:
-        logging.info("Engine is EXIT.")
+        logging.info("Engine is EXIT.")  # noqa: LOG015
 
         self._GesturaEngine.stop()
         self.app_state(False)

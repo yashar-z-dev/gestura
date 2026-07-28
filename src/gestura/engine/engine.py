@@ -1,16 +1,7 @@
 from types import TracebackType
-from typing import Callable, Any, Type
+from typing import Any, Callable
 
-from gestura.adapters import (
-    Listener, KeyboardListenerType, MouseListenerType
-)
-
-# ===== Core =====
-from gestura.config import (
-    ShortcutConfig,
-    MouseConfig,
-    KeyboardConfig
-)
+from gestura.adapters import KeyboardListenerType, Listener, MouseListenerType
 
 # ===== Default OS Adapters =====
 from gestura.adapters.pynput_adapters import (
@@ -19,13 +10,15 @@ from gestura.adapters.pynput_adapters import (
 )
 
 # ===== Core =====
+from gestura.config import KeyboardConfig, MouseConfig, ShortcutConfig
+
+# ===== Core =====
 from gestura.config.parser import parse_shortcut_config
-from gestura.config.models import ShortcutConfig
-from gestura.policy.engine import PolicyEngine
 from gestura.engine.worker import ShortcutWorker
-from gestura.models.policy import ActionEvent
 from gestura.input.keyboard.handler import KeyboardApp
 from gestura.input.mouse.handler import MouseApp
+from gestura.models.policy import ActionEvent
+from gestura.policy.engine import PolicyEngine
 
 
 class GesturaEngine:
@@ -44,10 +37,9 @@ class GesturaEngine:
         self,
         config: list[dict[str, Any]],
         publish_action: Callable[[ActionEvent], None],
-
         # OS listener factories (DI entry point)
         keyboard_listener_factory: KeyboardListenerType = KeyboardListener,
-        mouse_listener_factory: MouseListenerType = MouseListener
+        mouse_listener_factory: MouseListenerType = MouseListener,
     ) -> None:
 
         # -------------------------------
@@ -65,7 +57,8 @@ class GesturaEngine:
                 policy_engine=PolicyEngine(self._bundle.policies),
                 publish_action=self._publish_action,
                 worker_map=self._bundle.worker_map,
-                combined_window_seconds=4.0)
+                combined_window_seconds=4.0,
+            )
         )
 
         # Keyboard
@@ -73,7 +66,8 @@ class GesturaEngine:
             KeyboardConfig(
                 gestures=self._bundle.keyboard_gestures,
                 on_trigger=self._worker.submit_keyboard_triggers,
-                BufferWindowSeconds=1.5)
+                BufferWindowSeconds=1.5,
+            )
         )
 
         # Mouse
@@ -82,19 +76,16 @@ class GesturaEngine:
                 gestures=self._bundle.mouse_gestures,
                 on_trigger=self._worker.submit_mouse_triggers,
                 BufferWindowSeconds=4.0,
-                min_delta=8.0)
+                min_delta=8.0,
+            )
         )
 
         # -------------------------------
         # Create OS listeners (engine owns them)
         # -------------------------------
-        self._keyboard_listener: Listener = keyboard_listener_factory(
-            on_event=self._keyboard_app.HandleEvens
-        )
+        self._keyboard_listener: Listener = keyboard_listener_factory(on_event=self._keyboard_app.HandleEvens)
 
-        self._mouse_listener: Listener = mouse_listener_factory(
-            on_event=self._mouse_app.HandleEvens
-        )
+        self._mouse_listener: Listener = mouse_listener_factory(on_event=self._mouse_app.HandleEvens)
 
         self._running = False
 
@@ -131,9 +122,6 @@ class GesturaEngine:
         return self
 
     def __exit__(
-        self,
-        exc_type: Type[BaseException] | None,
-        exc: BaseException | None,
-        tb: TracebackType | None
+        self, exc_type: type[BaseException] | None, exc: BaseException | None, tb: TracebackType | None
     ) -> None:
         self.stop()

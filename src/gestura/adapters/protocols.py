@@ -1,9 +1,11 @@
-from typing import Protocol, Callable
-from ..models.inputs import MouseEvent, KeyboardEvent
+from typing import Callable, Protocol
+
+from ..models.inputs import KeyboardEvent, MouseEvent
 
 # --------------------------------------------------
 # Base Listener
 # --------------------------------------------------
+
 
 class Listener(Protocol):
     """Minimal event source abstraction."""
@@ -15,6 +17,7 @@ class Listener(Protocol):
 # --------------------------------------------------
 # Keyboard Listener Type
 # --------------------------------------------------
+
 
 class KeyboardListenerType(Protocol):
     """
@@ -31,6 +34,7 @@ class KeyboardListenerType(Protocol):
 # --------------------------------------------------
 # Mouse Listener Type
 # --------------------------------------------------
+
 
 class MouseListenerType(Protocol):
     """

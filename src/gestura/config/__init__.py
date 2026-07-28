@@ -1,7 +1,3 @@
-from .models import (
-    KeyboardConfig, MouseConfig, ShortcutConfig
-)
+from .models import KeyboardConfig, MouseConfig, ShortcutConfig
 
-__all__ = [
-    "KeyboardConfig", "MouseConfig", "ShortcutConfig"
-]
+__all__ = ["KeyboardConfig", "MouseConfig", "ShortcutConfig"]

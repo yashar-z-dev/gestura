@@ -1,8 +1,7 @@
 import logging
-from typing import Dict, List, Optional
 
-from ...models.keyboard import GestureKeyboardCondition
 from ...models.event import EventData_keyboard
+from ...models.keyboard import GestureKeyboardCondition
 
 
 class KeyboardGesturePipeline:
@@ -18,16 +17,16 @@ class KeyboardGesturePipeline:
 
     def __init__(
         self,
-        gestures: List[GestureKeyboardCondition],
+        gestures: list[GestureKeyboardCondition],
     ) -> None:
 
         self._gestures = gestures
 
         # last_key -> gestures
-        self._trigger_index: Dict[str, List[GestureKeyboardCondition]] = {}
+        self._trigger_index: dict[str, list[GestureKeyboardCondition]] = {}
 
         # callback -> last reported end_id
-        self._last_occurrence_end_id: Dict[str, int] = {}
+        self._last_occurrence_end_id: dict[str, int] = {}
 
         self._build_trigger_index()
 
@@ -46,9 +45,9 @@ class KeyboardGesturePipeline:
 
     def _sequence_end_id(
         self,
-        sequence: List[str],
-        events: List[EventData_keyboard],
-    ) -> Optional[int]:
+        sequence: list[str],
+        events: list[EventData_keyboard],
+    ) -> int | None:
         """
         Strict contiguous tail match.
         Returns end_id if sequence matches the last events exactly.
@@ -74,22 +73,20 @@ class KeyboardGesturePipeline:
     def process_for_trigger(
         self,
         trigger_key: str,
-        event_sequence: List[EventData_keyboard],
-    ) -> List[str]:
+        event_sequence: list[EventData_keyboard],
+    ) -> list[str]:
 
-        matched_callbacks: List[str] = []
+        matched_callbacks: list[str] = []
 
         relevant_gestures = self._trigger_index.get(trigger_key)
         if not relevant_gestures:
             return matched_callbacks
 
-        logging.debug(
-            f"[KeyboardPipeline] Evaluating {len(relevant_gestures)} "
-            f"gestures for trigger '{trigger_key}'"
+        logging.debug(  # noqa: LOG015
+            f"[KeyboardPipeline] Evaluating {len(relevant_gestures)} gestures for trigger '{trigger_key}'"
         )
 
         for gesture in relevant_gestures:
-
             end_id = self._sequence_end_id(
                 sequence=gesture.conditions,
                 events=event_sequence,

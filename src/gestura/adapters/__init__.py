@@ -1,7 +1,3 @@
-from .protocols import (
-    Listener, KeyboardListenerType, MouseListenerType
-)
+from .protocols import KeyboardListenerType, Listener, MouseListenerType
 
-__all__ = [
-    "Listener", "KeyboardListenerType", "MouseListenerType"
-]
+__all__ = ["KeyboardListenerType", "Listener", "MouseListenerType"]

@@ -1,13 +1,15 @@
-from typing import Callable, Optional
+from typing import Callable
+
 from pynput import mouse
-from ...models.inputs import MouseEvent, MouseClickEvent, MouseMoveEvent
+
+from ...models.inputs import MouseClickEvent, MouseEvent, MouseMoveEvent
 
 
 class MouseListener:
     def __init__(
-            self,
-            on_event: Callable[[MouseEvent], None],
-        ) -> None:
+        self,
+        on_event: Callable[[MouseEvent], None],
+    ) -> None:
         """
         Args:
             on_move: call with (x: int, y: int)
@@ -16,7 +18,7 @@ class MouseListener:
 
         self.on_event = on_event
 
-        self.listener: Optional[mouse.Listener] = None
+        self.listener: mouse.Listener | None = None
 
     # -------------- Mouse Move --------------
     def _on_move(self, x: int, y: int) -> None:
@@ -24,15 +26,12 @@ class MouseListener:
 
     # -------------- Mouse Click --------------
     def _on_click(self, x: int, y: int, button: mouse.Button, press: bool) -> None:
-        self.on_event(MouseClickEvent(x=x, y=y,position=button.name, press=press))
+        self.on_event(MouseClickEvent(x=x, y=y, position=button.name, press=press))
 
     # -------------- Start Listener --------------
     def start(self) -> None:
         if self.listener is None:
-            self.listener = mouse.Listener(
-                on_move=self._on_move,
-                on_click=self._on_click
-            )
+            self.listener = mouse.Listener(on_move=self._on_move, on_click=self._on_click)
             self.listener.start()
 
     # -------------- Stop Listener --------------

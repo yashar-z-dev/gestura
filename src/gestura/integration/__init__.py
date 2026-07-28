@@ -1,9 +1,12 @@
 from .action_bus import ActionBus
 from .action_dispatcher import ActionDispatcher
-from .models import PluginManifest, ActionProtocol, LogicProtocol, LogicResult
+from .models import ActionProtocol, LogicProtocol, LogicResult, PluginManifest
 
 __all__ = [
     "ActionBus",
     "ActionDispatcher",
-    "PluginManifest", "ActionProtocol", "LogicProtocol", "LogicResult",
+    "ActionProtocol",
+    "LogicProtocol",
+    "LogicResult",
+    "PluginManifest",
 ]

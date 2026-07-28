@@ -1,4 +1,4 @@
-from ..models.policy import TriggerEvent, CallbackPolicy, CallbackState
+from ..models.policy import CallbackPolicy, CallbackState, TriggerEvent
 
 
 class PolicyEngine:
@@ -55,12 +55,7 @@ class PolicyEngine:
     # Internal checks
     # ------------------------------------------------------------------
 
-    def _check_cooldown(
-        self,
-        state: CallbackState,
-        policy: CallbackPolicy,
-        now: float
-    ) -> bool:
+    def _check_cooldown(self, state: CallbackState, policy: CallbackPolicy, now: float) -> bool:
         """
         Ensures minimum spacing between executions.
         """
@@ -70,12 +65,7 @@ class PolicyEngine:
 
         return (now - state.last_executed_at) >= policy.cooldown_seconds
 
-    def _check_rate_limit(
-        self,
-        state: CallbackState,
-        policy: CallbackPolicy,
-        now: float
-    ) -> bool:
+    def _check_rate_limit(self, state: CallbackState, policy: CallbackPolicy, now: float) -> bool:
         """
         Sliding window rate limiter.
         """
@@ -101,4 +91,3 @@ class PolicyEngine:
 
         state.last_executed_at = now
         state.execution_timestamps.append(now)
-

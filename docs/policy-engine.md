@@ -41,11 +41,7 @@ By separating them:
 Each shortcut can define its own policy:
 
 ```python
-{
-    "cooldown_seconds": 1.0,
-    "max_triggers": 1,
-    "rate_window_seconds": 5.0
-}
+{"cooldown_seconds": 1.0, "max_triggers": 1, "rate_window_seconds": 5.0}
 ```
 
 ---

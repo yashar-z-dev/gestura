@@ -1,15 +1,17 @@
 # 100/100
 """
 __all__ = (
-    _BaseGestureMouse, Axis_X, Axis_Y, GestureMouseValidator, GestureMouseAdapter, 
+    _BaseGestureMouse, Axis_X, Axis_Y, GestureMouseValidator, GestureMouseAdapter,
     GestureMouse, GestureMouseCondition, TEST_GestureMouse, Test_GestureMouseCondition
     )
 """
 
 # NOTE: CPU 4% USE
 
-from typing import Literal, Union, Annotated, overload, Iterable, Any
-from pydantic import BaseModel, Field, TypeAdapter, ConfigDict
+from collections.abc import Iterable
+from typing import Annotated, Any, Literal, overload
+
+from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 
 
 # ========== Base models ==========
@@ -19,7 +21,9 @@ class _BaseGestureMouse(BaseModel):
 
     NOTE: Valid Data: Union[Axis_X, Axis_Y].
 
-    :param min_delta: Minimum move size(e.g. From a position of 200 pixels to 400 pixels is equal to a minimum delta of 200.)
+    :param min_delta: Minimum move size (
+        e.g. From a position of 200 pixels to 400 pixels is equal to a minimum delta of 200.
+    )
     """
 
     model_config = ConfigDict(extra="forbid")
@@ -34,6 +38,7 @@ class Axis_X(_BaseGestureMouse):
     :param left: oprator `-`
     :param right: oprator `+`
     """
+
     axis: Literal["x"] = "x"
     trend: Literal["left", "right"]
 
@@ -45,13 +50,14 @@ class Axis_Y(_BaseGestureMouse):
     :param up: oprator `-`
     :param down: oprator `+`
     """
+
     axis: Literal["y"] = "y"
     trend: Literal["up", "down"]
 
 
 # ===== Validators =====
 GestureMouseValidator = Annotated[
-    Union[Axis_X, Axis_Y],
+    Axis_X | Axis_Y,
     Field(discriminator="axis"),
 ]
 
@@ -61,15 +67,17 @@ GestureMouseListAdapter = TypeAdapter(list[GestureMouseValidator])
 
 # ========== Container model ==========
 class GestureMouse(BaseModel):
-    """ 
+    """
     Model structure for Mouse Gesture.
-    
-    :param conditions: List of GestureMouseValidator for Mouse Actions (e.g. [{axis="x", trend="left", min_delta=444}, {axis="y", trend="up", min_delta=444}])
+
+    :param conditions: List of GestureMouseValidator for Mouse Actions (
+        e.g. [{axis="x", trend="left", min_delta=444}, {axis="y", trend="up", min_delta=444}]
+    )
     """
 
     model_config = ConfigDict(extra="forbid")
 
-    conditions: list[GestureMouseValidator] = Field(default_factory=list)
+    conditions: list[GestureMouseValidator] = Field(default_factory=list[GestureMouseValidator])
 
     @overload
     def add_condition(
@@ -100,9 +108,6 @@ class GestureMouse(BaseModel):
         """
         Normalize ANY supported input into list[GestureMouseValidator]
         """
-        if isinstance(data, dict) and "conditions" in data:
-            data = data["conditions"]
-
         if isinstance(data, list | tuple):
             return GestureMouseListAdapter.validate_python(data)
 
@@ -165,9 +170,8 @@ class GestureMouseCondition(GestureMouse):
 # ===== Validators =====
 GestureMouseConditionAdapter = TypeAdapter(list[GestureMouseCondition])
 
-def Validator_GestureMouseCondition(
-        data: list[dict[str, Any]]
-    ) -> list[GestureMouseCondition]:
+
+def Validator_GestureMouseCondition(data: list[dict[str, Any]]) -> list[GestureMouseCondition]:
     """
     :param data: format GestureMouseCondition.
 

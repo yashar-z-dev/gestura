@@ -37,12 +37,14 @@ class MouseMoveEvent:
     x: int
     y: int
 
+
 @dataclass(frozen=True, slots=True, kw_only=True)
 class MouseClickEvent:
     x: int
     y: int
     position: str
     press: bool
+
 
 MouseEvent = MouseMoveEvent | MouseClickEvent
 ```
@@ -239,6 +241,7 @@ class SharedKeyboardAdapter:
 
 
 shared_keyboard = SharedKeyboardHub()
+
 
 def shared_keyboard_factory(on_event):
     return SharedKeyboardAdapter(shared_keyboard, on_event)

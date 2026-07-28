@@ -1,13 +1,12 @@
 import inspect
 import logging
-
-from typing import Any, Optional, TypeVar
+from typing import Any, TypeVar
 
 from .models import (
+    ActionProtocol,
+    LogicProtocol,
     LogicResult,
     PluginManifest,
-    LogicProtocol,
-    ActionProtocol,
 )
 
 _C = TypeVar("_C")
@@ -78,7 +77,7 @@ class ActionDispatcher:
     def get(
         self,
         key: str,
-    ) -> Optional[PluginManifest]:
+    ) -> PluginManifest | None:
         return self._registry.get(key)
 
     # ==========================================================
@@ -94,23 +93,13 @@ class ActionDispatcher:
 
         if param_names is None:
             sig = inspect.signature(cls.__init__)
-            param_names = tuple(
-                p.name
-                for p in sig.parameters.values()
-                if p.name != "self"
-            )
+            param_names = tuple(p.name for p in sig.parameters.values() if p.name != "self")
             self._ctor_cache[cls] = param_names
 
         try:
-            args = [
-                self._dependencies[name]
-                for name in param_names
-            ]
+            args = [self._dependencies[name] for name in param_names]
         except KeyError as exc:
-            raise RuntimeError(
-                f"Missing dependency '{exc.args[0]}' "
-                f"required by '{cls.__name__}'."
-            ) from None
+            raise RuntimeError(f"Missing dependency '{exc.args[0]}' required by '{cls.__name__}'.") from None
 
         return cls(*args)
 
@@ -129,14 +118,14 @@ class ActionDispatcher:
         manifest = self.get(key)
 
         if manifest is None:
-            logging.info("Unknown callback: %s", key)
+            logging.info("Unknown callback: %s", key)  # noqa: LOG015
             return {"warning": "Unknown callback"}
 
         # Logic
         logic: LogicProtocol[Any] = self._instantiate(manifest.logic)
         result: LogicResult[Any] = logic.execute()
 
-        logging.info(
+        logging.info(  # noqa: LOG015
             "Execute callback '%s' (%s)",
             key,
             result.ui_message,

@@ -8,10 +8,8 @@ class Logic_Pause:
 
     def execute(self):
         result = not self.state.fake_state
-        return LogicResult(
-            ui_message=f"result is {result}, {'pause' if result else 'resume'}",
-            payload=result
-        )
+        return LogicResult(ui_message=f"result is {result}, {'pause' if result else 'resume'}", payload=result)
+
 
 class Action_Pause:
     def __init__(self, fake_state):

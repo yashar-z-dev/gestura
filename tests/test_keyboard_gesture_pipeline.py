@@ -1,13 +1,11 @@
 from gestura.input.keyboard.pipeline import KeyboardGesturePipeline
-from gestura.models.keyboard import GestureKeyboardCondition
 from gestura.models.event import EventData_keyboard
-
-import pytest
-
+from gestura.models.keyboard import GestureKeyboardCondition
 
 # ------------------------------------------------------------
 # Helper
 # ------------------------------------------------------------
+
 
 def make_gesture(sequence, callback):
     obj = GestureKeyboardCondition()
@@ -21,16 +19,16 @@ def make_gesture(sequence, callback):
 # Basic Success
 # ------------------------------------------------------------
 
+
 def test_single_key_success():
     gesture = make_gesture(["esc"], "callback")
 
     pipeline = KeyboardGesturePipeline(gestures=[gesture])
 
     keys = []
-    keys.append(EventData_keyboard(id=1 ,press=True, key="a"))
-    keys.append(EventData_keyboard(id=2 ,press=True, key="b"))
-    keys.append(EventData_keyboard(id=3 ,press=True, key="esc"))
-
+    keys.append(EventData_keyboard(id=1, press=True, key="a"))
+    keys.append(EventData_keyboard(id=2, press=True, key="b"))
+    keys.append(EventData_keyboard(id=3, press=True, key="esc"))
 
     result = pipeline.process_for_trigger(
         trigger_key="esc",
@@ -44,15 +42,16 @@ def test_single_key_success():
 # Basic Failure
 # ------------------------------------------------------------
 
+
 def test_single_key_not_triggered():
     gesture = make_gesture(["esc"], "callback")
 
     pipeline = KeyboardGesturePipeline(gestures=[gesture])
 
     keys = []
-    keys.append(EventData_keyboard(id=1 ,press=True, key="a"))
-    keys.append(EventData_keyboard(id=2 ,press=True, key="b"))
-    keys.append(EventData_keyboard(id=3 ,press=True, key="c"))
+    keys.append(EventData_keyboard(id=1, press=True, key="a"))
+    keys.append(EventData_keyboard(id=2, press=True, key="b"))
+    keys.append(EventData_keyboard(id=3, press=True, key="c"))
 
     result = pipeline.process_for_trigger(
         trigger_key="c",
@@ -66,16 +65,16 @@ def test_single_key_not_triggered():
 # Ordered Sequence Success
 # ------------------------------------------------------------
 
+
 def test_multi_key_sequence_success():
     gesture = make_gesture(["ctrl", "k"], "callback")
 
     pipeline = KeyboardGesturePipeline(gestures=[gesture])
 
     keys = []
-    keys.append(EventData_keyboard(id=1 ,press=True, key="a"))
-    keys.append(EventData_keyboard(id=2 ,press=True, key="ctrl"))
-    keys.append(EventData_keyboard(id=3 ,press=True, key="k"))
-
+    keys.append(EventData_keyboard(id=1, press=True, key="a"))
+    keys.append(EventData_keyboard(id=2, press=True, key="ctrl"))
+    keys.append(EventData_keyboard(id=3, press=True, key="k"))
 
     result = pipeline.process_for_trigger(
         trigger_key="k",
@@ -89,14 +88,15 @@ def test_multi_key_sequence_success():
 # Ordered Sequence Failure (wrong order)
 # ------------------------------------------------------------
 
+
 def test_multi_key_wrong_order():
     gesture = make_gesture(["ctrl", "k"], "callback")
 
     pipeline = KeyboardGesturePipeline(gestures=[gesture])
 
     keys = []
-    keys.append(EventData_keyboard(id=1 ,press=True, key="k"))
-    keys.append(EventData_keyboard(id=2 ,press=True, key="ctrl"))
+    keys.append(EventData_keyboard(id=1, press=True, key="k"))
+    keys.append(EventData_keyboard(id=2, press=True, key="ctrl"))
 
     result = pipeline.process_for_trigger(
         trigger_key="ctrl",
@@ -110,6 +110,7 @@ def test_multi_key_wrong_order():
 # Multiple Gestures Same Trigger
 # ------------------------------------------------------------
 
+
 def test_multiple_gestures_same_trigger():
     g1 = make_gesture(["ctrl", "k"], "cb1")
     g2 = make_gesture(["ctrl", "c"], "cb2")
@@ -117,8 +118,8 @@ def test_multiple_gestures_same_trigger():
     pipeline = KeyboardGesturePipeline(gestures=[g1, g2])
 
     keys = []
-    keys.append(EventData_keyboard(id=2 ,press=True, key="ctrl"))
-    keys.append(EventData_keyboard(id=4 ,press=True, key="k"))
+    keys.append(EventData_keyboard(id=2, press=True, key="ctrl"))
+    keys.append(EventData_keyboard(id=4, press=True, key="k"))
 
     result = pipeline.process_for_trigger(
         trigger_key="k",
@@ -126,8 +127,8 @@ def test_multiple_gestures_same_trigger():
     )
     assert set(result) == {"cb1"}
 
-    keys.append(EventData_keyboard(id=5 ,press=True, key="ctrl"))
-    keys.append(EventData_keyboard(id=6 ,press=True, key="c"))
+    keys.append(EventData_keyboard(id=5, press=True, key="ctrl"))
+    keys.append(EventData_keyboard(id=6, press=True, key="c"))
 
     result = pipeline.process_for_trigger(
         trigger_key="c",
@@ -136,9 +137,11 @@ def test_multiple_gestures_same_trigger():
 
     assert set(result) == {"cb2"}
 
+
 # ------------------------------------------------------------
 # Trigger Filtering Works
 # ------------------------------------------------------------
+
 
 def test_trigger_filtering_skips_unrelated():
     g1 = make_gesture(["ctrl", "k"], "cb1")
@@ -147,8 +150,8 @@ def test_trigger_filtering_skips_unrelated():
     pipeline = KeyboardGesturePipeline(gestures=[g1, g2])
 
     keys = []
-    keys.append(EventData_keyboard(id=1 ,press=True, key="shift"))
-    keys.append(EventData_keyboard(id=3 ,press=True, key="x"))
+    keys.append(EventData_keyboard(id=1, press=True, key="shift"))
+    keys.append(EventData_keyboard(id=3, press=True, key="x"))
 
     result = pipeline.process_for_trigger(
         trigger_key="x",
@@ -162,6 +165,7 @@ def test_trigger_filtering_skips_unrelated():
 # Window Optimization Check
 # ------------------------------------------------------------
 
+
 def test_sequence_outside_search_window_not_detected():
     gesture = make_gesture(["a", "b", "c"], "callback")
 
@@ -169,11 +173,11 @@ def test_sequence_outside_search_window_not_detected():
 
     # sequence is too far in history
     keys = []
-    keys.append(EventData_keyboard(id=1 ,press=True, key="a"))
-    keys.append(EventData_keyboard(id=2 ,press=True, key="b"))
-    keys.append(EventData_keyboard(id=3 ,press=True, key="c"))
+    keys.append(EventData_keyboard(id=1, press=True, key="a"))
+    keys.append(EventData_keyboard(id=2, press=True, key="b"))
+    keys.append(EventData_keyboard(id=3, press=True, key="c"))
     for i in range(20):
-        keys.append(EventData_keyboard(id=i+5 ,press=True, key="x"))
+        keys.append(EventData_keyboard(id=i + 5, press=True, key="x"))
 
     result = pipeline.process_for_trigger(
         trigger_key="a",

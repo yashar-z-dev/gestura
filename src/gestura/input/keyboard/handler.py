@@ -1,16 +1,15 @@
 # 100/100
 
 import logging
-from typing import Callable, Optional
+from typing import Callable
 
 from ...config import KeyboardConfig
-from ...models.inputs import KeyboardEvent
-
-from ...models.keyboard import GestureKeyboardCondition
 from ...models.event import EventData_keyboard
-from .pipeline import KeyboardGesturePipeline
+from ...models.inputs import KeyboardEvent
+from ...models.keyboard import GestureKeyboardCondition
 from ...utils.key_normalizer import KeyUtils
 from ..event_buffer import EventBuffer
+from .pipeline import KeyboardGesturePipeline
 
 
 class KeyboardApp:
@@ -39,25 +38,23 @@ class KeyboardApp:
         self._gesture_definitions: list[GestureKeyboardCondition] = config.gestures
 
         # Time-windowed key buffer
-        self._event_buffer = EventBuffer(config.BufferWindowSeconds) # Time window for gesture detection
+        self._event_buffer = EventBuffer(config.BufferWindowSeconds)  # Time window for gesture detection
 
         # Gesture pipeline (responsible for matching logic)
         # Internally builds an index by starting key
-        self._gesture_pipeline = KeyboardGesturePipeline(
-            gestures=self._gesture_definitions
-        )
+        self._gesture_pipeline = KeyboardGesturePipeline(gestures=self._gesture_definitions)
 
     # ------------------------------------------------------------------
     # Validator
     # ------------------------------------------------------------------
-    def _validator(self, event: KeyboardEvent) -> Optional[EventData_keyboard]:
+    def _validator(self, event: KeyboardEvent) -> EventData_keyboard | None:
         """
         Generate EventData_keyboard private model.
         """
 
         key_name = KeyUtils.parse_key(key=event.key, output_type="str")
         if not key_name:
-            logging.debug("Ignored unsupported key name: %s", event.key)
+            logging.debug("Ignored unsupported key name: %s", event.key)  # noqa: LOG015
             return
 
         valid_event = EventData_keyboard(id=self._event_id, key=key_name, press=event.press)
@@ -86,8 +83,6 @@ class KeyboardApp:
         Currently not used in gesture evaluation.
         """
 
-        pass
-
     # ------------------------------------------------------------------
     # Gesture Evaluation
     # ------------------------------------------------------------------
@@ -113,7 +108,6 @@ class KeyboardApp:
 
         # Emit callbacks
         self._emit_callback(matched_callbacks)
-
 
     # ------------------------------------------------------------------ #
     # API

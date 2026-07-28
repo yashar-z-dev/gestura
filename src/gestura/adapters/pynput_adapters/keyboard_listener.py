@@ -1,6 +1,7 @@
-from typing import Callable, Optional, Any
+from typing import Any, Callable
 
 import pynput
+
 from ...models.inputs import KeyboardEvent
 
 
@@ -22,7 +23,7 @@ class KeyboardListener:
         return: (key: str, press: bool)
         """
         self.on_event = on_event
-        self._listener: Optional[pynput.keyboard.Listener] = None
+        self._listener: pynput.keyboard.Listener | None = None
 
     # ---------------- Internal Event Callback ---------------- #
     def _on_press(self, key: Any) -> None:
@@ -55,10 +56,7 @@ class KeyboardListener:
         Start listening to all keyboard events.
         """
         if self._listener is None:
-            self._listener = pynput.keyboard.Listener(
-                on_press=self._on_press,
-                on_release=self._on_release
-            )
+            self._listener = pynput.keyboard.Listener(on_press=self._on_press, on_release=self._on_release)
             self._listener.start()
 
     # ---------------- Stop Listening ---------------- #

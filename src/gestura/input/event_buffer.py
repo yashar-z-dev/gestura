@@ -64,6 +64,14 @@ class EventBuffer:
 
         return [event for _, event in self._buffer]
 
+    def snapshot_with_time(self) -> list[tuple[float, Any]]:
+        self._drain()
+
+        now = self.func_now()
+        self._prune(now)
+
+        return list(self._buffer)
+
     def clear(self) -> None:
         """Remove all staged and buffered events."""
         self._pre_buffer.clear()

@@ -9,3 +9,9 @@
 
 - strict typing (Pyright)
 - Ruff clean
+
+# 3.1.1
+
+## add
+
+- EventBuffer.snapshot_with_time

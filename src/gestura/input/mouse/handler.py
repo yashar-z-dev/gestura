@@ -1,6 +1,6 @@
-import logging
 from typing import Callable
 
+from gestura import logging
 from ...config import MouseConfig
 from ...models.event import EventData_click, EventData_move, MouseButtons
 from ...models.inputs import MouseEvent, MouseMoveEvent
@@ -47,7 +47,7 @@ class MouseApp:
         # Filter negative coordinates
         if event.x < 0 or event.y < 0:
             # warning (most apply map for negative values, some time rate negative so hight)
-            logging.debug(f"Ignored unsupported mouse negative; x={event.x}, y={event.y}")  # noqa: LOG015
+            logging.debug(f"Ignored unsupported mouse negative; x={event.x}, y={event.y}")
             return
 
         # Detected move or click
@@ -73,7 +73,7 @@ class MouseApp:
                     press=event.press,
                 )
             except ValueError:
-                logging.warning("Ignored unsupported mouse position button: %s", event.position)  # noqa: LOG015
+                logging.warning("Ignored unsupported mouse position button: %s", event.position)
                 return
 
             self._click_event_id += 1

@@ -1,6 +1,6 @@
 # 100/100
 
-import time
+from time import monotonic
 from typing import Callable
 from dataclasses import dataclass, field
 
@@ -82,4 +82,4 @@ class ShortcutConfig:
     publish_action: Callable[[ActionEvent], None]
     worker_map: WorkerGestureMap
     combined_window_seconds: float = 4.0
-    func_now: Callable[[], float] = time.monotonic
+    func_now: Callable[[], float] = monotonic

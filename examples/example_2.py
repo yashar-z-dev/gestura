@@ -1,14 +1,15 @@
 import json
-import logging
 import time
 from pathlib import Path
 from typing import Any
+import logging as python_logging
 
 # Action definition
 from exit import Action_Exit, Logic_Exit
 from pause import Action_Pause, Logic_Pause
 
 # API
+from gestura import logging
 from gestura import GesturaEngine
 
 # Integration
@@ -79,13 +80,13 @@ class main:
             time.sleep(0.01)
 
     def start(self):
-        logging.info("Engine is Started...")  # noqa: LOG015
+        logging.info("Engine is Started...")
         self.app_state(True)
         self._GesturaEngine.start()
         self._loop()
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
+    logging.setup(python_logging.INFO)
     _main = main()
     _main.start()

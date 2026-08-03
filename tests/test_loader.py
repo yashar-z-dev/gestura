@@ -1,9 +1,9 @@
 import json
-import logging
 from typing import get_args
 
 import pytest
 
+from gestura import logging
 from gestura.config.parser import parse_shortcut_config
 from gestura.models.mouse import GestureMouseValidator
 
@@ -14,7 +14,7 @@ def gesture_config():
 
     BASE_DIR = Path(__file__).resolve().parent
     json_path = BASE_DIR / "sample_config.json"
-    logging.info(json_path)  # noqa: LOG015
+    logging.info(json_path)
     with open(json_path, "r", encoding="utf-8") as f:
         return json.load(f)
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import time
+from time import monotonic
 from collections import deque
 from typing import Any, Callable
 
@@ -18,7 +18,7 @@ class EventBuffer:
         self,
         window: float,
         max_event_rate_per_sec: int = 3000,
-        func_now: Callable[[], float] = time.monotonic,
+        func_now: Callable[[], float] = monotonic,
     ) -> None:
         self.window = window
         self.func_now = func_now

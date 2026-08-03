@@ -1,8 +1,8 @@
-import logging
 import queue
 import threading
 from typing import Callable
 
+from gestura import logging
 from ..config import ShortcutConfig
 from ..models.policy import ActionEvent, TriggerEvent
 
@@ -93,7 +93,7 @@ class ShortcutWorker:
             try:
                 self._handle_trigger(_TriggerEvent)
             except Exception:
-                logging.exception(f"[ShortcutWorker] Error handling trigger: {_TriggerEvent}")  # noqa: LOG015
+                logging.exception(f"[ShortcutWorker] Error handling trigger: {_TriggerEvent}")
 
     # ------------------------------------------------------------------
     # Trigger dispatcher

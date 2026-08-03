@@ -1,10 +1,11 @@
 import json
-import logging
 import time
 from pathlib import Path
 from typing import Any
+import logging as python_logging
 
 # API
+from gestura import logging
 from gestura import ActionEvent, GesturaEngine
 
 
@@ -27,7 +28,7 @@ class main:
         return config
 
     def pump_worker_events(self, action_event: ActionEvent):
-        logging.info(action_event)  # noqa: LOG015
+        logging.info(action_event)
         if action_event.callback == "exit":
             self.running = False
 
@@ -37,13 +38,13 @@ class main:
             time.sleep(0.01)
 
     def start(self):
-        logging.info("Engine is Started...")  # noqa: LOG015
+        logging.info("Engine is Started...")
         self.app_state(True)
         self._GesturaEngine.start()
         self._loop()
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
+    logging.setup(python_logging.INFO)
     _main = main()
     _main.start()

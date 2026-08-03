@@ -1,11 +1,12 @@
 def main():
-    import logging
     import time
     from typing import Any
+    import logging as python_logging
 
+    from gestura import logging
     from gestura import ActionEvent, GesturaEngine
 
-    logging.basicConfig(level=logging.INFO)
+    logging.setup(python_logging.INFO)
 
     DEFAULT_POLICY = {"cooldown_seconds": 1.0, "max_triggers": 1, "rate_window_seconds": 5.0}
     config: list[dict[str, Any]] = [
@@ -38,7 +39,7 @@ def main():
 
     def handle_event(event: ActionEvent):
         nonlocal running
-        logging.info(f"🔥 Triggered → {event.callback}")  # noqa: LOG015
+        logging.info(f"🔥 Triggered → {event.callback}")
 
         if event.callback == "exit":
             running = False

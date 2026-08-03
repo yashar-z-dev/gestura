@@ -7,6 +7,7 @@ TriggerEvent  →  Policy  →  ActionEvent
 from collections import deque
 from dataclasses import dataclass, field
 from typing import Literal, Protocol
+from time import monotonic
 
 
 @dataclass(frozen=True, slots=True)
@@ -19,7 +20,7 @@ class TriggerEvent:
 @dataclass(frozen=True, slots=True)
 class ActionEvent:
     callback: str
-    triggered_at: float
+    triggered_at: float = monotonic()
 
 
 @dataclass(frozen=True, slots=True)
@@ -48,7 +49,7 @@ class CallbackState:
     last_executed_at: float = 0.0
 
     # Execution timestamps for sliding rate window
-    execution_timestamps: deque[float] = field(default_factory=deque)
+    execution_timestamps: deque[float] = field(default_factory=deque[float])
 
 
 class PolicyEngineProtocol(Protocol):

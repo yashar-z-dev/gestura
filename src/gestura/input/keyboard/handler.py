@@ -1,8 +1,8 @@
 # 100/100
 
-import logging
 from typing import Callable
 
+from gestura import logging
 from ...config import KeyboardConfig
 from ...models.event import EventData_keyboard
 from ...models.inputs import KeyboardEvent
@@ -54,7 +54,7 @@ class KeyboardApp:
 
         key_name = KeyUtils.parse_key(key=event.key, output_type="str")
         if not key_name:
-            logging.debug("Ignored unsupported key name: %s", event.key)  # noqa: LOG015
+            logging.debug("Ignored unsupported key name: %s", event.key)
             return
 
         valid_event = EventData_keyboard(id=self._event_id, key=key_name, press=event.press)

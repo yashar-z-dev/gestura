@@ -1,5 +1,4 @@
-import logging
-
+from gestura import logging
 from ...models.event import EventData_keyboard
 from ...models.keyboard import GestureKeyboardCondition
 
@@ -82,7 +81,7 @@ class KeyboardGesturePipeline:
         if not relevant_gestures:
             return matched_callbacks
 
-        logging.debug(  # noqa: LOG015
+        logging.debug(
             f"[KeyboardPipeline] Evaluating {len(relevant_gestures)} gestures for trigger '{trigger_key}'"
         )
 

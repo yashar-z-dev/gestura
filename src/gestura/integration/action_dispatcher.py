@@ -1,7 +1,7 @@
 import inspect
-import logging
 from typing import Any, TypeVar
 
+from gestura import logging
 from .models import (
     ActionProtocol,
     LogicProtocol,
@@ -118,14 +118,14 @@ class ActionDispatcher:
         manifest = self.get(key)
 
         if manifest is None:
-            logging.info("Unknown callback: %s", key)  # noqa: LOG015
+            logging.info("Unknown callback: %s", key)
             return {"warning": "Unknown callback"}
 
         # Logic
         logic: LogicProtocol[Any] = self._instantiate(manifest.logic)
         result: LogicResult[Any] = logic.execute()
 
-        logging.info(  # noqa: LOG015
+        logging.info(
             "Execute callback '%s' (%s)",
             key,
             result.ui_message,

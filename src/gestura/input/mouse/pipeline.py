@@ -5,9 +5,9 @@ tests:
     test_MouseGesturePipeline.py
 """
 
-import logging
 from typing import Any
 
+from gestura import logging
 from ...models.event import EventData_move
 from ...models.mouse import GestureMouseCondition
 
@@ -62,7 +62,7 @@ class MouseGestureDetector:
 
         segments.sort(key=lambda s: s["start_id"])
 
-        logging.debug(  # noqa: LOG015
+        logging.debug(
             "[Segments] %s",
             [f"{s['axis']}:{s['trend']} Δ{s['delta']} ({s['start_id']}→{s['end_id']})" for s in segments],
         )
@@ -96,7 +96,7 @@ class MouseGestureDetector:
                 continue
 
             if new_trend != current_trend:
-                logging.debug(  # noqa: LOG015
+                logging.debug(
                     "[TrendChange] axis=%s id=%s %s→%s",
                     axis,
                     curr.id,
@@ -163,7 +163,7 @@ class MouseGestureDetector:
 
         # 1️⃣ Large jump → always real
         if abs(delta) >= self.jitter_max_delta:
-            logging.debug(  # noqa: LOG015
+            logging.debug(
                 "[Reversal] Large jump axis=%s id=%s Δ=%s → REAL",
                 axis,
                 events[index].id,
@@ -184,7 +184,7 @@ class MouseGestureDetector:
             if trend == opposite_trend:
                 confirm += 1
             elif trend == current_trend:
-                logging.debug(  # noqa: LOG015
+                logging.debug(
                     "[Reversal] JITTER axis=%s id=%s → ignored",
                     axis,
                     events[index].id,
@@ -192,14 +192,14 @@ class MouseGestureDetector:
                 return False
 
         if confirm >= self.lookahead:
-            logging.debug(  # noqa: LOG015
+            logging.debug(
                 "[Reversal] Confirmed axis=%s id=%s → REAL",
                 axis,
                 events[index].id,
             )
             return True
 
-        logging.debug(  # noqa: LOG015
+        logging.debug(
             "[Reversal] Not enough confirmation axis=%s id=%s → JITTER",
             axis,
             events[index].id,
@@ -232,14 +232,10 @@ class MouseGestureDetector:
                     break
 
             if not found:
-                logging.debug(  # noqa: LOG015
-                    "[MatchFail] %s failed at condition %s", gesture.callback, cond
-                )
+                logging.debug("[MatchFail] %s failed at condition %s", gesture.callback, cond)
                 return None
 
-        logging.debug(  # noqa: LOG015
-            "[MatchSuccess] %s ending at id=%s", gesture.callback, last_end_id
-        )
+        logging.debug("[MatchSuccess] %s ending at id=%s", gesture.callback, last_end_id)
 
         return last_end_id
 
@@ -292,9 +288,7 @@ class MouseGestureOccurrenceFilter:
         for callback, end_id in occurrences:
             last = self._last_occurrence_end_id.get(callback)
 
-            logging.debug(  # noqa: LOG015
-                "[OccurrenceCheck] %s last=%s new=%s", callback, last, end_id
-            )
+            logging.debug("[OccurrenceCheck] %s last=%s new=%s", callback, last, end_id)
 
             if last is None or end_id > last:
                 triggered.append(callback)

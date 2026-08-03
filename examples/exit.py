@@ -1,6 +1,7 @@
 # type: ignore
-import logging
+from typing import Any
 
+from gestura import logging
 from gestura.integration.models import LogicResult
 
 
@@ -8,7 +9,7 @@ class Logic_Exit:
     def __init__(self):
         pass
 
-    def execute(self) -> LogicResult:
+    def execute(self) -> LogicResult[Any]:
         return LogicResult(ui_message="exit with ui toggle.", payload="exit")
 
 
@@ -19,7 +20,7 @@ class Action_Exit:
         self.app_state = app_state
 
     def execute(self, payload) -> None:
-        logging.info("Engine is EXIT.")  # noqa: LOG015
+        logging.info("Engine is EXIT.")
 
         self._GesturaEngine.stop()
         self.app_state(False)
